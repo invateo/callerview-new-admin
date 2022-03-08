@@ -20,7 +20,10 @@ const App = () => {
             <Switch>
               <Route exact path="/">{token ? <Redirect to="/dashboard" /> : <Login />}</Route>
               <Route path="/forgot-password">{token ? <Redirect to="/dashboard" /> : <ForgotPassword />}</Route>
-              <Route path="/reset-password/:id">{token ? <Redirect to="/dashboard" /> : <ResetPassword />}</Route>
+              <Route
+                path="/reset-password/:id" 
+                render={() => token ? <Redirect to="/dashboard" /> : <ResetPassword />}
+              />
               {token && (
                 <>
                   <Route exact path="/dashboard" component={Dashboard} />

@@ -142,7 +142,6 @@ body {
 }
 .Toastify__toast-body {
   background: #fff !important;
-  font-family: Roboto !important;
   font-size: 0.875rem;
 }
 .Toastify__close-button {

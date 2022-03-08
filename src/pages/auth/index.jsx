@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {NavLink, useHistory} from 'react-router-dom';
+import {NavLink} from 'react-router-dom';
 import {toast} from 'react-toastify';
 import {ReactComponent as Logo} from "../../assets/icons/logo.svg";
 import IllustrationIcon from "../../assets/icons/illustration.svg";
@@ -10,7 +10,6 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const history = useHistory();
 
   const handleSumbit = (e) => {
     e.preventDefault();
@@ -31,11 +30,13 @@ const Login = () => {
               <div className="toast-div">Login successfully.</div>
             );
             window.location.reload(); 
-          }else{
+          }else {
+            setLoading(false);
             toast.error("Login failed");
           }
         })
         .catch(error => {
+          setLoading(false);
           toast.error(error.response.data? error.response.data.message : 'Login failed: Unknown error');
         });
     }
