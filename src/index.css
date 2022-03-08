@@ -1,13 +1,168 @@
+:root {
+  --color-primary: 30 64 175;
+  --color-secondary: 226 232 240;
+  --color-success: 132 204 22;
+  --color-info: 6 182 212;
+  --color-warning: 250 204 21;
+  --color-pending: 249 115 22;
+  --color-danger: 220 38 38;
+  --color-light: 241 245 249;
+  --color-dark: 30 41 59;
+  --color-slate-50: 248 250 252;
+  --color-slate-100: 241 245 249;
+  --color-slate-200: 226 232 240;
+  --color-slate-300: 203 213 225;
+  --color-slate-400: 148 163 184;
+  --color-slate-500: 100 116 139;
+  --color-slate-600: 71 85 105;
+  --color-slate-700: 51 65 85;
+  --color-slate-800: 30 41 59;
+  --color-slate-900: 15 23 42;
+}
+*, :after, :before {
+  --tw-translate-x: 0;
+  --tw-translate-y: 0;
+  --tw-rotate: 0;
+  --tw-skew-x: 0;
+  --tw-skew-y: 0;
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+  --tw-pan-x: ;
+  --tw-pan-y: ;
+  --tw-pinch-zoom: ;
+  --tw-scroll-snap-strictness: proximity;
+  --tw-ordinal: ;
+  --tw-slashed-zero: ;
+  --tw-numeric-figure: ;
+  --tw-numeric-spacing: ;
+  --tw-numeric-fraction: ;
+  --tw-ring-inset: ;
+  --tw-ring-offset-width: 0px;
+  --tw-ring-offset-color: #fff;
+  --tw-ring-color: rgba(59,130,246,.5);
+  --tw-ring-offset-shadow: 0 0 #0000;
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-shadow: 0 0 #0000;
+  --tw-shadow-colored: 0 0 #0000;
+  --tw-blur: ;
+  --tw-brightness: ;
+  --tw-contrast: ;
+  --tw-grayscale: ;
+  --tw-hue-rotate: ;
+  --tw-invert: ;
+  --tw-saturate: ;
+  --tw-sepia: ;
+  --tw-drop-shadow: ;
+  --tw-backdrop-blur: ;
+  --tw-backdrop-brightness: ;
+  --tw-backdrop-contrast: ;
+  --tw-backdrop-grayscale: ;
+  --tw-backdrop-hue-rotate: ;
+  --tw-backdrop-invert: ;
+  --tw-backdrop-opacity: ;
+  --tw-backdrop-saturate: ;
+  --tw-backdrop-sepia: ;
+}
+.login {
+  position: relative;
+  overflow: hidden;
+}
+.login:before {
+  --tw-rotate: -4deg;
+  background-color: rgb(var(--color-primary)/.2);
+  border-radius: 100%;
+  bottom: 0;
+  content: "";
+  left: 0;
+  margin-bottom: -15%;
+  margin-left: -13%;
+  margin-top: -28%;
+  position: absolute;
+  top: 0;
+  transform: translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+  width: 57%;
+}
+.login:after {
+  --tw-rotate: -4deg;
+    --tw-bg-opacity: 1;
+    background-color: rgb(var(--color-primary)/var(--tw-bg-opacity));
+    border-radius: 100%;
+    bottom: 0;
+    content: "";
+    left: 0;
+    margin-bottom: -12%;
+    margin-left: -13%;
+    margin-top: -20%;
+    position: absolute;
+    top: 0;
+    transform: translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+    width: 57%;
+}
+:after, :before {
+  --tw-content: "";
+}
+*, :after, :before {
+  border: 0 solid #e5e7eb;
+  box-sizing: border-box;
+}
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+.justify-between {
+  justify-content: space-between;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/** Classes for  toast **/
+.Toastify__toast {
+  box-shadow: 0px 3px 10px -1px rgba(0, 0, 0, 0.15) !important;
+  background: #fff !important;
+}
+.Toastify__toast--default {
+  background: #fff !important;
+  color: #000 !important;
+}
+.Toastify__toast--info {
+  background: #fff !important;
+  color: #000 !important;
+}
+.Toastify__toast--success {
+  background: #fff !important;
+  color: #000 !important;
+}
+.Toastify__toast--warning {
+  background: #fff !important;
+  color: #000 !important;
+}
+.Toastify__toast--error {
+  background: #fff !important;
+  color: #000 !important;
+}
+.Toastify__toast-body {
+  background: #fff !important;
+  font-family: Roboto !important;
+  font-size: 0.875rem;
+}
+.Toastify__close-button {
+  color: #fff !important;
+}
+.Toastify__close-button:hover,
+.Toastify__close-button:focus {
+  color: #fff !important;
+}
+.Toastify__progress-bar {
+  background-color: #fff !important;
+  color: #fff;
+}
+.toast-div {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+}
+.toast-div img {
+  width: 2rem;
+  height: 2rem;
 }

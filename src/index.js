@@ -3,6 +3,13 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+toast.configure({
+  draggable: false,
+  autoClose: 3000,
+});
 
 ReactDOM.render(
   <React.StrictMode>

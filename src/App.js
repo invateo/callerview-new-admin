@@ -1,25 +1,43 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import { BrowserRouter as Router, Route, Redirect, Switch } from "react-router-dom";
+import Dashboard from "./pages/dashboard";
+import Admin from "./pages/admins";
+import Adverts from "./pages/adverts";
+import Users from "./pages/users";
+import Downloads from "./pages/downloads";
+import Videos from "./pages/videos";
+import Settings from "./pages/settings";
+import Categories from "./pages/settings/categories";
+import Regions from "./pages/settings/regions";
+import Login from "./pages/auth";
+import ResetPassword from "./pages/auth/reset-password";
+import ForgotPassword from "./pages/auth/forgot-password";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const App = () => {
+  let token = localStorage.getItem("CallerView-XXX");
+        return (
+          <Router>
+            <Switch>
+              <Route exact path="/">{token ? <Redirect to="/dashboard" /> : <Login />}</Route>
+              <Route path="/forgot-password">{token ? <Redirect to="/dashboard" /> : <ForgotPassword />}</Route>
+              <Route path="/reset-password/:id">{token ? <Redirect to="/dashboard" /> : <ResetPassword />}</Route>
+              {token && (
+                <>
+                  <Route exact path="/dashboard" component={Dashboard} />
+                  <Route path="/users" component={Users} />
+                  <Route path="/videos" component={Videos} />
+                  <Route path="/admins" component={Admin} />
+                  <Route path="/adverts" component={Adverts} />
+                  <Route path="/downloads" component={Downloads} />
+                  <Route path="/categories" component={Categories} />
+                  <Route path="/regions" component={Regions} />
+                  <Route path="/settings" component={Settings} />
+                </>
+              )}
+              <Route component={() => <Redirect to="/" />} />
+            </Switch>
+          </Router> 
+        )
+    }
 
 export default App;
