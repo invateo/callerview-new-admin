@@ -1,5 +1,5 @@
-import { SpinnerCircularFixed } from "spinners-react";
 import styled, { css } from "styled-components";
+import { ReactComponent as LoaderIcon } from "../assets/icons/loader.svg";
 
 const DarkBackground = styled.div`
   display: none; /* Hidden by default */
@@ -28,13 +28,9 @@ export const Loader = () => {
   return (
     <div>
       <DarkBackground>
-        <SpinnerCircularFixed
-          size={50}
-          thickness={100}
-          speed={100}
-          color="rgba(255, 255, 255, 1)"
-          secondaryColor="rgba(0, 0, 0, 0.44)"
-        />
+        <div className="col-span-6 sm:col-span-3 xl:col-span-2 flex flex-col justify-end items-center">
+          <LoaderIcon />
+        </div>
       </DarkBackground>
     </div>
   );

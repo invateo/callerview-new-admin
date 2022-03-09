@@ -77,7 +77,9 @@ const ForgotPassword = () => {
                             <button onClick={handleSumbit} className="btn btn-primary py-3 px-4 w-full xl:w-32 xl:mr-3 align-top">Submit</button>
                             <NavLink to="/" className="btn btn-secondary py-3 px-4 w-full xl:w-32 xl:mr-3 align-top">Back to Login</NavLink>
                         </div>
-                        {message !== "" ? <div class="bg-theme-8 rounded mt-8 py-4 px-2 intro-x text-slate-500 block mt-2 text-xs sm:text-sm">{message}.</div>: null}
+                        {message !== "" ? (
+                          <div class="alert alert-success-soft show flex items-center my-10" role="alert">{message}.</div>
+                        ): null}
                     </div>
                 </div>
             </div>

@@ -1,111 +1,171 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../components/layout";
 import { ReactComponent as CartIcon } from "../assets/icons/cart.svg";
-import { ReactComponent as MoneyIcon } from "../assets/icons/money.svg";
-import { ReactComponent as UsersIcon } from "../assets/icons/users.svg";
+import { AdminIcon, UsersIcon } from "../assets/icons.jsx";
 import { Loader } from "../utility/loader";
 import AxiosInstance from "../config/axios";
+import { toast } from "react-toastify";
+import { colour } from "../styling/colour";
+import { NavLink } from "react-router-dom";
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState({
     videoCount: 0,
     videos: [],
-    userCount: 0
-  })
+    userCount: 0,
+    adminCount: 0,
+  });
 
   useEffect(() => {
     setLoading(true);
-    AxiosInstance.get('/total/users')
-    .then(res => {
-      setLoading(false);
-      let result = res.data.data.totalUsers;
-      AxiosInstance.get('/video/all')
-      .then(res => {
-        setLoading(false);
-        setStats({
-          videoCount: res.data.data.videos?.length,
-          videos: res.data.data.videos,
-          userCount: result
-        })
+    AxiosInstance.get("/total/users")
+      .then((res) => {
+        let result = res.data.data.totalUsers;
+        AxiosInstance.get("/admin/all")
+          .then((res) => {
+            let admins = res.data.data.length;
+            AxiosInstance.get("/video/all")
+              .then((res) => {
+                setLoading(false);
+                setStats({
+                  videoCount: res.data.data.videos?.length,
+                  videos: res.data.data.videos,
+                  userCount: result,
+                  adminCount: admins,
+                });
+              })
+              .catch((err) => {
+                setLoading(false);
+                toast.error(
+                  err.response.message ?? "An unknown error occured."
+                );
+              });
+          })
+          .catch((err) => {
+            setLoading(false);
+            toast.error(err.response.message ?? "An unknown error occured.");
+          });
       })
-      .catch(err => console.log(err));
-    })
-    .catch(err => console.log(err));
+      .catch((err) => {
+        setLoading(false);
+        toast.error(err.response.message ?? "An unknown error occured.");
+      });
   }, []);
-
 
   return (
     <Layout>
-      {loading && <Loader /> }
-        <>
-          <div className="top-bar mt-3">
-            <div className="pt-10 pb-4">
-              <h2 className="text-2xl text-black font-medium truncate mr-5">
-                Dashboard
-              </h2>
-            </div>
+      {loading && <Loader />}
+      <>
+        <div className="top-bar mt-3">
+          <div className="pt-10 pb-4">
+            <h2 className="text-2xl text-black font-medium truncate mr-5">
+              Dashboard
+            </h2>
           </div>
-          <div className="grid grid-cols-12 gap-6">
-            <div className="col-span-12 xxl:col-span-9">
-              <div className="grid grid-cols-12 gap-6">
-                <div className="col-span-12 mt-8">
-                  <div className="grid grid-cols-12 gap-6 mt-5">
-                    <div className="col-span-12 sm:col-span-6 xl:col-span-4 intro-y">
-                      <div className="report-box zoom-in">
-                        <div className="box p-5 flex justify-between items-start">
-                          <div>
-                            <CartIcon />
+        </div>
+        <div className="grid grid-cols-12 gap-6">
+          <div className="col-span-12 xxl:col-span-9">
+            <div className="grid grid-cols-12 gap-6">
+              <div className="col-span-12 mt-8">
+                <div className="grid grid-cols-12 gap-6 mt-5">
+                  <NavLink to="/videos" className="col-span-12 sm:col-span-6 xl:col-span-4 intro-y">
+                    <div className="report-box zoom-in">
+                      <div className="box p-5 flex justify-between items-start">
+                        <div>
+                          <CartIcon />
+                        </div>
+                        <div>
+                          <div className="text-3xl font-medium leading-8">
+                            {stats.videoCount}
                           </div>
-                          <div>
-                            <div className="text-3xl font-medium leading-8">{stats.videoCount}</div>
-                            <div className="text-base text-gray-600 mt-1">
-                              Available Videos
-                            </div>
+                          <div className="text-base text-gray-600 mt-1">
+                            Available Videos
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className="col-span-12 sm:col-span-6 xl:col-span-4 intro-y">
-                      <div className="report-box zoom-in">
-                        <div className="box p-5 flex justify-between items-start">
-                          <div>
-                            <MoneyIcon />
+                  </NavLink>
+                  <NavLink to="/users" className="col-span-12 sm:col-span-6 xl:col-span-4 intro-y">
+                    <div className="report-box zoom-in">
+                      <div className="box p-5 flex justify-between items-start">
+                        <div>
+                          <UsersIcon width="40" color={colour.orange} />
+                        </div>
+                        <div>
+                          <div className="text-3xl font-medium leading-8">
+                            {stats.userCount}
                           </div>
-                          <div>
-                            <div className="text-3xl font-medium leading-8">
-                              0
-                            </div>
-                            <div className="text-base text-gray-600 mt-1">
-                              All-time Sales
-                            </div>
+                          <div className="text-base text-gray-600 mt-1">
+                            Total Users
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className="col-span-12 sm:col-span-6 xl:col-span-4 intro-y">
-                      <div className="report-box zoom-in">
-                        <div className="box p-5 flex justify-between items-start">
-                          <div>
-                            <UsersIcon />
+                  </NavLink>
+                  <NavLink to="/admins" className="col-span-12 sm:col-span-6 xl:col-span-4 intro-y">
+                    <div className="report-box zoom-in">
+                      <div className="box p-5 flex justify-between items-start">
+                        <div>
+                          <AdminIcon width="40" color={colour.secondary} />
+                        </div>
+                        <div>
+                          <div className="text-3xl font-medium leading-8">
+                            {stats.adminCount}
                           </div>
-                          <div>
-                            <div className="text-3xl font-medium leading-8">
-                              {stats.userCount}
-                            </div>
-                            <div className="text-base text-gray-600 mt-1">
-                              Total Users
-                            </div>
+                          <div className="text-base text-gray-600 mt-1">
+                            All Admins
                           </div>
                         </div>
                       </div>
+                    </div>
+                  </NavLink>
+                </div>
+              </div>
+              <div className="col-span-12 lg:col-span-6 mt-6">
+                <div className="intro-y flex flex-col sm:flex-row items-center justify-between mt-8">
+                  <h2 className="text-xl text-black font-medium truncate mr-5">
+                    Video Statistics
+                  </h2>
+                    <div className="w-full sm:w-auto mt-4 sm:mt-0">
+                        <NavLink to="/downloads" className="btn btn-primary shadow-md">View All</NavLink>
+                    </div>
+                </div>
+                <div className="intro-y box mt-5">
+                  <div className="pt-3" id="responsive-table">
+                    <div className="overflow-x-auto">
+                      <table className="table">
+                        <thead>
+                          <tr>
+                            <th className="whitespace-nowrap">Title</th>
+                            <th className="whitespace-nowrap">Upload Date</th>
+                            <th className="whitespace-nowrap">
+                              Number of Downloads
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {stats.videos.slice(0, 6).map((video, i) => (
+                            <tr key={`video-${i}`}>
+                              <td className="whitespace-nowrap">{video.name}</td>
+                              <td className="whitespace-nowrap">
+                                {video.releaseDate}
+                              </td>
+                              <td className="whitespace-nowrap">
+                                {video.numberOfUsage}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </>
+        </div>
+      </>
     </Layout>
   );
 };
