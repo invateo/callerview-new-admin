@@ -182,8 +182,6 @@ const Admin = () => {
       });
   }
 
-  console.log("logged in", loggedinUser);
-
   return (
     <>
     {addNewModal && (
@@ -269,7 +267,7 @@ const Admin = () => {
           setCurrentAdminId("");
         }}
         deleteAction={deleteAdmin}
-        headerTitle={"Delete Admin"}
+        headerTitle={"Admin"}
       />
     )}
     {editModal && (

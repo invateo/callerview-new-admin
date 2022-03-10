@@ -55,7 +55,7 @@ export const ConfirmModal = ({
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header flex justify-between items-center">
-              <h2 className="font-medium text-lg mr-auto">{headerTitle}</h2>
+              <h2 className="font-medium text-lg mr-auto">Delete {headerTitle}</h2>
               <div onClick={closeModal} className="cursor-pointer">
                 <CloseIcon />
               </div>
@@ -66,7 +66,7 @@ export const ConfirmModal = ({
                   data-feather="x-circle"
                   className="w-16 h-16 text-theme-12 mx-auto mt-3"
                 ></i>
-                <div className="text-gray-600 mt-2">Are you sure you want to delete this admin?</div>
+                <div className="text-gray-600 mt-2">Are you sure you want to delete this {headerTitle.toLowerCase()}?</div>
               </div>
               <div className="px-5 pb-8 text-center">
                 <div onClick={deleteAction} className="btn w-24 btn-primary mr-4">

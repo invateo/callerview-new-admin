@@ -42,7 +42,7 @@ export const ShowDropDown = ({ openDeleteModal, openEditModal, access}) => {
 
         <div
           x-show="dropdownOpen "
-          className={`w-60 overflow-hidden mr-5 absolute assnewassetsoptionsdown bg-white pointer transition transform origin-top ${
+          className={`w-40 overflow-hidden mr-5 absolute assnewassetsoptionsdown bg-white pointer transition transform origin-top ${
             dropdown === "flex" ? "p-2 opacity-1 translate-y-0 shadow-md dropdown-div" : "opacity-0 h-0 -translate-y-2 p-0"
           }`}
         >
@@ -53,7 +53,7 @@ export const ShowDropDown = ({ openDeleteModal, openEditModal, access}) => {
             }}
             className="p-2 text-base text-primary rounded-sm hover:bg-slate-100  cursor-pointer w-full text-left flex"
           >
-            Edit Privileges
+            Edit
           </button>
           {access && (
             <button

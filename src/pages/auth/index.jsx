@@ -88,7 +88,7 @@ const Login = () => {
                         <div className="intro-x flex text-gray-700 dark:text-gray-600 text-xs sm:text-sm mt-4">
                             <div className="flex items-center mr-auto">
                                 <input id="remember-me" type="checkbox" className="form-check-input border mr-2" />
-                                <label className="cursor-pointer select-none" for="remember-me">Remember me</label>
+                                <label className="cursor-pointer select-none" htmlFor="remember-me">Remember me</label>
                             </div>
                             <NavLink to="/forgot-password">Forgot Password?</NavLink> 
                         </div>

@@ -9,6 +9,19 @@ import { NavLink } from "react-router-dom";
 import { switchLoading } from "../store/actions";
 import { useDispatch } from "react-redux";
 
+export const getLoggedinUser = (dispatch, setLoggedinUser) => {
+  AxiosInstance.get("/admin").then((res) => {
+    dispatch(switchLoading(false));
+    setLoggedinUser({email: res.data.data.admin.email, privileges: res.data.data.privilege?.name});
+  })
+  .catch((err) => {
+    dispatch(switchLoading(false));
+    toast.error(
+      err?.response?.data?.message ?? "An unknown error occured."
+    );
+  });
+}
+
 const Dashboard = () => {
   const [stats, setStats] = useState({
     videoCount: 0,
