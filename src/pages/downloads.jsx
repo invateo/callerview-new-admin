@@ -85,7 +85,7 @@ const Downloads = () => {
           <div className="flex flex-col sm:flex-row sm:items-end xl:items-start">
             <form id="tabulator-html-filter-form" className="flex w-full">
               <div className="sm:flex w-full items-center sm:mr-4 mt-2 xl:mt-0">
-                <label class="flex-none w-auto xl:flex-initial mr-2">Search:</label>
+                <label className="flex-none w-auto xl:flex-initial mr-2">Search:</label>
                <input
                   type="text"
                   className="form-control w-full mt-2 sm:mt-0"
@@ -143,7 +143,7 @@ const Downloads = () => {
               </div>
               <div className="tabulator-footer" style={{ marginTop: "1rem" }}>
                 <span className="tabulator-paginator">
-                <label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2">Filter:</label>
+                <label className="w-12 flex-none xl:w-auto xl:flex-initial mr-2">Filter:</label>
                   <select
                     className="tabulator-page-size cursor-pointer"
                     aria-label="Page Size"

@@ -332,6 +332,7 @@ const Admin = () => {
             <h2 className="text-xl text-black font-medium truncate mr-5">
               All Admins
             </h2>
+            {loggedinUser?.privileges?.includes("create") && (
             <div className="sm:w-auto sm:mt-0">
               <div
                 className="btn btn-primary shadow-md"
@@ -340,6 +341,7 @@ const Admin = () => {
                 Add New Admin
               </div>
             </div>
+            )}
           </div>
           <div className="intro-y box p-5 mt-8" style={{zIndex: "0"}}>
             <div id="responsive-table">

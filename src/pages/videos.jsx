@@ -8,6 +8,15 @@ import { getLoggedinUser } from "./dashboard";
 import { CustomModal, ConfirmModal } from "../components/modal";
 import { ShowDropDown } from "../components/dropdown";
 
+export const formatDate = (payload) => {
+  let date = new Date(payload);
+  return date?.getFullYear() +
+    "-" +
+    ("0" + (date?.getMonth() + 1)).slice(-2) +
+    "-" +
+    ("0" + date?.getDate()).slice(-2);
+};
+
 const Videos = () => {
   const dispatch = useDispatch();
   const [loggedinUser, setLoggedinUser] = useState();
@@ -119,14 +128,6 @@ const Videos = () => {
 
   const closeNewVideoModal = () => {
     setNewVideoModal(false);
-  }
-  const formatDate = (payload) => {
-    let date = new Date(payload);
-    return date?.getFullYear() +
-      "-" +
-      ("0" + (date?.getMonth() + 1)).slice(-2) +
-      "-" +
-      ("0" + date?.getDate()).slice(-2);
   }
 
   const handleChangeInput = (e) => {
