@@ -71,7 +71,7 @@ const Downloads = () => {
   };
 
   return (
-    <Layout>
+    <Layout title="Downloads">
       {loading && <Loader />}
       <>
         <div className="top-bar mt-3">

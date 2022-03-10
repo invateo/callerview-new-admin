@@ -5,6 +5,7 @@ import {ReactComponent as Logo} from "../../assets/icons/logo.svg";
 import IllustrationIcon from "../../assets/icons/illustration.svg";
 import AxiosInstance from "../../config/axios";
 import {Loader} from '../../utility/loader';
+import PageTitle from '../../components/pageTitle';
 
 const ResetPassword = () => {
   const {id} = useParams();
@@ -42,6 +43,8 @@ const ResetPassword = () => {
     }
   }
     return (
+      <>
+      <PageTitle title="Reset Password" />
       <div className="login">
         {loading && <Loader loading={loading} />}
         <div className="container sm:px-10">
@@ -91,6 +94,7 @@ const ResetPassword = () => {
             </div>
         </div>
       </div>
+      </>
     );
 }
 

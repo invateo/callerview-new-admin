@@ -5,6 +5,7 @@ import {ReactComponent as Logo} from "../../assets/icons/logo.svg";
 import IllustrationIcon from "../../assets/icons/illustration.svg";
 import AxiosInstance from "../../config/axios";
 import {Loader} from '../../utility/loader';
+import PageTitle from '../../components/pageTitle';
 
 const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
@@ -39,6 +40,8 @@ const ForgotPassword = () => {
     }
   }
     return (
+      <>
+      <PageTitle title="Forgot Password" />
       <div className="login">
         {loading && <Loader loading={loading} />}
         <div className="container sm:px-10">
@@ -85,6 +88,7 @@ const ForgotPassword = () => {
             </div>
         </div>
       </div>
+      </>
     );
 }
 

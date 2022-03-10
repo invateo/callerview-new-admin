@@ -54,7 +54,7 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <Layout>
+    <Layout title="Dashboard">
       {loading && <Loader />}
       <>
         <div className="top-bar mt-3">
@@ -123,17 +123,20 @@ const Dashboard = () => {
                 </div>
               </div>
               <div className="col-span-12 lg:col-span-6 mt-6">
-                <div className="intro-y flex flex-col sm:flex-row items-center justify-between mt-8">
+                <div className="intro-y flex items-center justify-between mt-8">
                   <h2 className="text-xl text-black font-medium truncate mr-5">
                     Video Statistics
                   </h2>
-                    <div className="w-full sm:w-auto mt-4 sm:mt-0">
+                    <div className="sm:w-auto sm:mt-0">
                         <NavLink to="/downloads" className="btn btn-primary shadow-md">View All</NavLink>
                     </div>
                 </div>
                 <div className="intro-y box mt-5">
                   <div className="pt-3" id="responsive-table">
                     <div className="overflow-x-auto">
+                    {stats.videoCount === 0 ? (
+                      <div className="w-full text-center my-10">No videos.</div>
+                    ) : (
                       <table className="table">
                         <thead>
                           <tr>
@@ -158,6 +161,7 @@ const Dashboard = () => {
                           ))}
                         </tbody>
                       </table>
+                    )}
                     </div>
                   </div>
                 </div>

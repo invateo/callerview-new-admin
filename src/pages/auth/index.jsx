@@ -5,6 +5,7 @@ import {ReactComponent as Logo} from "../../assets/icons/logo.svg";
 import IllustrationIcon from "../../assets/icons/illustration.svg";
 import AxiosInstance from "../../config/axios";
 import {Loader} from '../../utility/loader';
+import PageTitle from '../../components/pageTitle';
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
@@ -42,6 +43,8 @@ const Login = () => {
     }
   }
     return (
+      <>
+      <PageTitle title="Login" />
       <div className="login">
         {loading && <Loader loading={loading} />}
         <div className="container sm:px-10">
@@ -97,6 +100,7 @@ const Login = () => {
             </div>
         </div>
       </div>
+      </>
     );
 }
 
