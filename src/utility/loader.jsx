@@ -1,5 +1,6 @@
 import styled, { css } from "styled-components";
 import { ReactComponent as LoaderIcon } from "../assets/icons/loader.svg";
+import { useSelector } from "react-redux";
 
 const DarkBackground = styled.div`
   display: none; /* Hidden by default */
@@ -14,8 +15,8 @@ const DarkBackground = styled.div`
   background-color: rgb(0, 0, 0); /* Fallback color */
   background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
 
-  ${() =>
-    css`
+  ${({disappear}) =>
+    disappear && css`
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
@@ -25,9 +26,10 @@ const DarkBackground = styled.div`
 `;
 
 export const Loader = () => {
+  const { loading } = useSelector((state) => state.utility);
   return (
     <div>
-      <DarkBackground>
+      <DarkBackground disappear={loading} >
         <div className="col-span-6 sm:col-span-3 xl:col-span-2 flex flex-col justify-end items-center">
           <LoaderIcon />
         </div>

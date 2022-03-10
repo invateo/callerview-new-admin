@@ -4,11 +4,12 @@ import {toast} from 'react-toastify';
 import {ReactComponent as Logo} from "../../assets/icons/logo.svg";
 import IllustrationIcon from "../../assets/icons/illustration.svg";
 import AxiosInstance from "../../config/axios";
-import {Loader} from '../../utility/loader';
 import PageTitle from '../../components/pageTitle';
+import { switchLoading } from "../../store/actions";
+import { useDispatch } from "react-redux";
 
 const Login = () => {
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -18,7 +19,7 @@ const Login = () => {
       toast.error("Please enter a valid email and password");
     }
     else {
-      setLoading(true);
+      dispatch(switchLoading(true));
       let data = {
         email,
         password
@@ -32,12 +33,12 @@ const Login = () => {
             );
             window.location.reload(); 
           }else {
-            setLoading(false);
+            dispatch(switchLoading(false));
             toast.error("Login failed");
           }
         })
         .catch(error => {
-          setLoading(false);
+          dispatch(switchLoading(false));
           toast.error(error.response.data? error.response.data.message : 'Login failed: Unknown error');
         });
     }
@@ -46,7 +47,6 @@ const Login = () => {
       <>
       <PageTitle title="Login" />
       <div className="login">
-        {loading && <Loader loading={loading} />}
         <div className="container sm:px-10">
             <div className="block xl:grid grid-cols-2 gap-4">
                 <div className="hidden xl:flex flex-col min-h-screen">

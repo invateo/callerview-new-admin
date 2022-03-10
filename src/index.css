@@ -63,6 +63,9 @@
   --tw-backdrop-saturate: ;
   --tw-backdrop-sepia: ;
 }
+.content {
+  z-index: 12;
+}
 .login {
   position: relative;
   overflow: hidden;
@@ -164,4 +167,65 @@ body {
 .toast-div img {
   width: 2rem;
   height: 2rem;
+}
+.GeneralOverlay {
+  z-index: 12;
+  background: rgba(0, 0, 0, 0.4);
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 0rem !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+.ReactModal__Overlay {
+  opacity: 0;
+}
+
+.ReactModal__Overlay--after-open {
+  opacity: 1;
+  transition: opacity 200ms ease-out;
+}
+
+.ReactModal__Overlay--before-close {
+  opacity: 0;
+  transition: opacity 150ms ease-in;
+}
+@media only screen and (max-width: 550px) {
+  .postionmoal {
+    height: 100% !important;
+    max-width: 100%;
+    max-height: 100vh !important;
+    width: 100%;
+    border-radius: 0;
+    padding-left: 1.1875rem;
+    padding-right: 1.25rem;
+  }
+}
+
+.Addassets {
+  max-height: 74vh;
+  width: 550px;
+  max-width: 95%;
+  box-sizing: border-box;
+  border-radius: 0.625rem;
+  top: 0;
+  margin-right: 0 !important;
+  z-index: 100;
+  }
+.Addassets:focus {
+  outline: none;
+}
+  @media screen and (min-width: 550px) and (min-height: 400px) and (max-height: 700px) {
+    .Addassets {
+      max-height: 95%;
+    }
+  }
+.dropdown-div {
+  transform: translateX(-40%);
+  z-index: 90;
+}
+.invert svg {
+  transform: rotate(90deg);
 }

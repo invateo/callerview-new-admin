@@ -6,6 +6,12 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Modal from "react-modal";
+import { Loader } from './utility/loader';
+import { Provider } from "react-redux";
+import store from "./store";
+
+Modal.setAppElement("#root");
 
 toast.configure({
   draggable: false,
@@ -13,9 +19,12 @@ toast.configure({
 });
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <Provider store={store}>
+    <React.StrictMode>
+      <Loader />
+      <App />
+    </React.StrictMode>
+  </Provider>,
   document.getElementById('root')
 );
 

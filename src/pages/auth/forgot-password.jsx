@@ -4,13 +4,14 @@ import {toast} from 'react-toastify';
 import {ReactComponent as Logo} from "../../assets/icons/logo.svg";
 import IllustrationIcon from "../../assets/icons/illustration.svg";
 import AxiosInstance from "../../config/axios";
-import {Loader} from '../../utility/loader';
 import PageTitle from '../../components/pageTitle';
+import { switchLoading } from "../../store/actions";
+import { useDispatch } from "react-redux";
 
 const ForgotPassword = () => {
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [email, setEmail] = useState("");
+  const dispatch = useDispatch();
 
   const handleSumbit = (e) => {
     e.preventDefault();
@@ -18,14 +19,14 @@ const ForgotPassword = () => {
       toast.error("Please enter a valid email");
     }
     else {
-      setLoading(true);
+      dispatch(switchLoading(true));
       let data = {
         email
       }
       AxiosInstance.post('forgot/password', data)
         .then(response => {
           if (response.data.status === 200) {
-            setLoading(false);
+            dispatch(switchLoading(false));
             setMessage(response.data.message);
             toast.success(
               <div className="toast-div">{response.data.message}</div>
@@ -34,7 +35,7 @@ const ForgotPassword = () => {
         })
         .catch(error => {
           // console.log(error.response.data);
-          setLoading(false);
+          dispatch(switchLoading(false));
           toast.error(error.response.data.message);
         });
     }
@@ -43,7 +44,6 @@ const ForgotPassword = () => {
       <>
       <PageTitle title="Forgot Password" />
       <div className="login">
-        {loading && <Loader loading={loading} />}
         <div className="container sm:px-10">
             <div className="block xl:grid grid-cols-2 gap-4">
                 <div className="hidden xl:flex flex-col min-h-screen">

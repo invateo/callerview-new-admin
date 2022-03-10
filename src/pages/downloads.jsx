@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../components/layout";
-import { Loader } from "../utility/loader";
 import AxiosInstance from "../config/axios";
 import { toast } from "react-toastify";
+import { switchLoading } from "../store/actions";
+import { useDispatch } from "react-redux";
 
 const Downloads = () => {
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
   const [videos, setVideos] = useState([]);
   const [meta, setMeta] = useState({
     total: 0,
@@ -26,15 +27,15 @@ const Downloads = () => {
       toast.error("Please enter a search value.");
     }
     else {
-      setLoading(true);
+      dispatch(switchLoading(true));
       AxiosInstance.get(`/video/search?q=${searchVal}`)
         .then(res => { 
           setVideos([...res.data.data]);
-          setLoading(false);
+          dispatch(switchLoading(false));
           setsearchVal("");
         })
         .catch(error => {
-          setLoading(false);
+          dispatch(switchLoading(false));
           toast.error(error.response.data? error.response.data.message : 'Unknown error');
         });
     }
@@ -51,10 +52,10 @@ const Downloads = () => {
   }
 
   const getVideos = (page, limit) => {
-    setLoading(true);
+    dispatch(switchLoading(true));
     AxiosInstance.get(`/video/view/${page ?? meta.currPage}?limit=${limit ?? meta.limit}`)
       .then((res) => {
-        setLoading(false);
+        dispatch(switchLoading(false));
         const result = res.data.data;
         setVideos([...result?.video]);
         setMeta({
@@ -65,14 +66,13 @@ const Downloads = () => {
         })
       })
       .catch((err) => {
-        setLoading(false);
-        toast.error(err.response.message ?? "An unknown error occured.");
+        dispatch(switchLoading(false));
+        toast.error(err?.response?.data?.message ?? "An unknown error occured.");
       });
   };
 
   return (
     <Layout title="Downloads">
-      {loading && <Loader />}
       <>
         <div className="top-bar mt-3">
           <div className="pt-10 pb-4">

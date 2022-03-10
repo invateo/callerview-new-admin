@@ -2,23 +2,24 @@ import React, { useEffect, useState } from "react";
 import Layout from "../components/layout";
 import { ReactComponent as CartIcon } from "../assets/icons/cart.svg";
 import { AdminIcon, UsersIcon } from "../assets/icons.jsx";
-import { Loader } from "../utility/loader";
 import AxiosInstance from "../config/axios";
 import { toast } from "react-toastify";
 import { colour } from "../styling/colour";
 import { NavLink } from "react-router-dom";
+import { switchLoading } from "../store/actions";
+import { useDispatch } from "react-redux";
 
 const Dashboard = () => {
-  const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState({
     videoCount: 0,
     videos: [],
     userCount: 0,
     adminCount: 0,
   });
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    setLoading(true);
+    dispatch(switchLoading(true));
     AxiosInstance.get("/total/users")
       .then((res) => {
         let result = res.data.data.totalUsers;
@@ -27,7 +28,7 @@ const Dashboard = () => {
             let admins = res.data.data.length;
             AxiosInstance.get("/video/all")
               .then((res) => {
-                setLoading(false);
+                dispatch(switchLoading(false));
                 setStats({
                   videoCount: res.data.data.videos?.length,
                   videos: res.data.data.videos,
@@ -36,26 +37,26 @@ const Dashboard = () => {
                 });
               })
               .catch((err) => {
-                setLoading(false);
+                dispatch(switchLoading(false));
                 toast.error(
-                  err.response.message ?? "An unknown error occured."
+                  err?.response?.data?.message ?? "An unknown error occured."
                 );
               });
           })
           .catch((err) => {
-            setLoading(false);
-            toast.error(err.response.message ?? "An unknown error occured.");
+            dispatch(switchLoading(false));
+            toast.error(err?.response?.data?.message ?? "An unknown error occured.");
           });
       })
       .catch((err) => {
-        setLoading(false);
-        toast.error(err.response.message ?? "An unknown error occured.");
+        dispatch(switchLoading(false));
+        toast.error(err?.response?.data?.message ?? "An unknown error occured.");
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <Layout title="Dashboard">
-      {loading && <Loader />}
       <>
         <div className="top-bar mt-3">
           <div className="pt-10 pb-4">

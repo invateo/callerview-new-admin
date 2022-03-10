@@ -1,4 +1,3 @@
-import React, { Component } from "react";
 import { BrowserRouter as Router, Route, Redirect, Switch } from "react-router-dom";
 import Dashboard from "./pages/dashboard";
 import Admin from "./pages/admins";

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { ReactComponent as Logo } from "../assets/icons/logo.svg";
 import { ReactComponent as BurgerIcon } from "../assets/icons/burger-menu.svg";
@@ -14,6 +14,10 @@ import { ReactComponent as LogoutIcon } from "../assets/icons/logout.svg";
 import PageTitle from "./pageTitle";
 
 const Layout = ({ title, children }) => {
+  const [show, setShow] = useState(false);
+  const toggleMenu = () => {
+    setShow((val) => !val);
+  }
   const logOut = () => {
     localStorage.removeItem("CallerView-XXX");
     window.location.reload();
@@ -22,7 +26,7 @@ const Layout = ({ title, children }) => {
     <>
       <PageTitle title={title} />
       <div className="main">
-        <div className="mobile-menu md:hidden">
+        <div className="mobile-menu px-4 md:hidden">
           <div className="mobile-menu-bar">
             <NavLink
               exact
@@ -32,12 +36,12 @@ const Layout = ({ title, children }) => {
             >
               <Logo />
             </NavLink>
-            <NavLink exact to="/" id="mobile-menu-toggler">
+            <div onClick={toggleMenu} id="mobile-menu-toggler" className={`${show ? "invert" : ""}`}>
               <BurgerIcon />
-            </NavLink>
+            </div>
           </div>
-          <ul className="border-t border-theme-29 py-5 hidden">
-            <li>
+          <ul className={`${show ? "" : "hidden"} border-t border-theme-29 py-5`}>
+            <li onClick={() => setShow(false)}>
               <NavLink
                 exact
                 to="/dashboard"
@@ -50,7 +54,7 @@ const Layout = ({ title, children }) => {
                 <div className="menu__title"> Dashboard </div>
               </NavLink>
             </li>
-            <li>
+            <li onClick={() => setShow(false)}>
               <NavLink
                 exact
                 to="/users"
@@ -63,7 +67,7 @@ const Layout = ({ title, children }) => {
                 <div className="menu__title"> Users </div>
               </NavLink>
             </li>
-            <li>
+            <li onClick={() => setShow(false)}>
               <NavLink
                 exact
                 to="/videos"
@@ -76,7 +80,7 @@ const Layout = ({ title, children }) => {
                 <div className="menu__title"> Videos </div>
               </NavLink>
             </li>
-            <li>
+            <li onClick={() => setShow(false)}>
               <NavLink
                 exact
                 to="/adverts"
@@ -89,7 +93,7 @@ const Layout = ({ title, children }) => {
                 <div className="menu__title"> Adverts </div>
               </NavLink>
             </li>
-            <li>
+            <li onClick={() => setShow(false)}>
               <NavLink
                 exact
                 to="/admins"
@@ -105,7 +109,7 @@ const Layout = ({ title, children }) => {
 
             <li className="menu__devider my-6"></li>
 
-            <li>
+            <li onClick={() => setShow(false)}>
               <NavLink
                 exact
                 to="/categories"
@@ -118,7 +122,7 @@ const Layout = ({ title, children }) => {
                 <div className="menu__title"> Categories </div>
               </NavLink>
             </li>
-            <li>
+            <li onClick={() => setShow(false)}>
               <NavLink
                 exact
                 to="/regions"
@@ -131,7 +135,7 @@ const Layout = ({ title, children }) => {
                 <div className="menu__title"> Regions </div>
               </NavLink>
             </li>
-            <li>
+            <li onClick={() => setShow(false)}>
               <NavLink
                 exact
                 to="/settings"
@@ -160,7 +164,7 @@ const Layout = ({ title, children }) => {
             </li>
           </ul>
         </div>
-        <div className="flex">
+        <div className={`md:flex ${show ? "hidden" : "flex"}`}>
           <nav className="side-nav">
             <NavLink
               exact
@@ -281,8 +285,7 @@ const Layout = ({ title, children }) => {
                   <div className="side-menu__title"> Settings </div>
                 </NavLink>
               </li>
-              <li className="menu__devider my-6"></li>
-
+              <li className="side-nav__devider my-6"></li>
               <li>
                 <div
                   onClick={logOut}

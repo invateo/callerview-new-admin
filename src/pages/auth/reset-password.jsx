@@ -4,12 +4,13 @@ import {toast} from 'react-toastify';
 import {ReactComponent as Logo} from "../../assets/icons/logo.svg";
 import IllustrationIcon from "../../assets/icons/illustration.svg";
 import AxiosInstance from "../../config/axios";
-import {Loader} from '../../utility/loader';
 import PageTitle from '../../components/pageTitle';
+import { switchLoading } from "../../store/actions";
+import { useDispatch } from "react-redux";
 
 const ResetPassword = () => {
   const {id} = useParams();
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
   const [password, setPassword] = useState("");
   const [recheck, setRecheck] = useState("");
   const history = useHistory();
@@ -22,7 +23,7 @@ const ResetPassword = () => {
       toast.error("Passwords do not match");
     }
     else {
-      setLoading(true);
+      dispatch(switchLoading(true));
       let data = {
         new_password: password,
         token: id
@@ -37,7 +38,7 @@ const ResetPassword = () => {
           history.push("/");
         })
         .catch(error => {
-           setLoading(false);
+           dispatch(switchLoading(false));
           toast.error(error.response.data.message);
         });
     }
@@ -46,7 +47,6 @@ const ResetPassword = () => {
       <>
       <PageTitle title="Reset Password" />
       <div className="login">
-        {loading && <Loader loading={loading} />}
         <div className="container sm:px-10">
             <div className="block xl:grid grid-cols-2 gap-4">
                 <div className="hidden xl:flex flex-col min-h-screen">
