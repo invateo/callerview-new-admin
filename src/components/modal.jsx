@@ -8,6 +8,7 @@ export const CustomModal = ({
   modalIsOpen,
   afterOpenModal,
   closeModal,
+  shortModal
 }) => {
   return (
     <div>
@@ -16,12 +17,13 @@ export const CustomModal = ({
         onAfterOpen={afterOpenModal}
         onRequestClose={closeModal}
         contentLabel="Modal"
-        className={"Addassets manageAssets relative"}
+        style={{marginTop: "-4rem"}}
+        className={`postionmoal relative ${shortModal ? "deleteassets" : "Addassets"}`}
         overlayClassName={"GeneralOverlay"}
       >
         <div className="modal-dialog">
           <div className="modal-content">
-            <div className="modal-header flex justify-between items-center">
+            <div className={`modal-header flex justify-between items-center ${shortModal ? "" : "footed"}`}>
               <h2 className="font-medium text-lg mr-auto">{headerTitle}</h2>
               <div onClick={closeModal} className="cursor-pointer">
                 <CloseIcon />
@@ -49,7 +51,8 @@ export const ConfirmModal = ({
         onAfterOpen={afterOpenModal}
         onRequestClose={closeModal}
         contentLabel="Modal"
-        className={"Addassets manageAssets relative"}
+        style={{marginTop: "-4rem"}}
+        className={"deleteassets postionmoal relative"}
         overlayClassName={"GeneralOverlay"}
       >
         <div className="modal-dialog">

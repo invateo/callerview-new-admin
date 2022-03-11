@@ -78,6 +78,7 @@ const Categories = () => {
         modalIsOpen={addNewModal}
         closeModal={closeNewModal}
         headerTitle={"Add New Video Category"}
+        shortModal
       >
         <div className="modal-dialog">
           <div className="modal-content">

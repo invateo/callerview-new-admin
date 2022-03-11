@@ -77,6 +77,7 @@ const Regions = () => {
         modalIsOpen={addNewModal}
         closeModal={closeNewModal}
         headerTitle={"Add New Video Region"}
+        shortModal
       >
         <div className="modal-dialog">
           <div className="modal-content">

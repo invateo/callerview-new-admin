@@ -43,6 +43,7 @@ const Videos = () => {
     releaseDate: "",
     image: ""
   });
+  const [message, setMessage] = useState("");
   const [deleteModal, setDeleteModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [ currentVideoId, setCurrentVideoId] = useState("");
@@ -206,6 +207,7 @@ const Videos = () => {
     data.append("video", selectedFile);
     
     setTypeLoading(true);
+    type !== "img" && setMessage("");
     axios({
       url: `${base}/video/upload`,
       method: "POST",
@@ -218,14 +220,15 @@ const Videos = () => {
     .then((res) => {
       if (res.data.status === 200) {
         setTypeLoading(false);
+        type !== "img" && setMessage("Video uploaded!");
         if (type === "img") {
           setVideo({ ...video, image: res.data.url });
         } else setVideo({ ...video, link: res.data.url });
-        // return false;
       }
     })
     .catch((err) => {
       setTypeLoading(false);
+      type !== "img" && setMessage("Error uploading the file, please try again.");
       toast.error(err?.response?.data?.message ?? "An unknown error occured.");
     });
   }
@@ -268,7 +271,7 @@ const Videos = () => {
         >
           <div className="modal-dialog modal-lg">
             <div className="modal-content">
-              <div className="modal-body grid grid-cols-12 gap-4 gap-y-3 mb-5">
+              <div className="modal-body grid grid-cols-12 gap-4 gap-y-3 mb-5 md:mb-0">
                 <div className="col-span-12 md:col-span-6">
                   <label htmlFor="modal-form-1" className="form-label">
                     Video Title
@@ -388,13 +391,16 @@ const Videos = () => {
                         disabled={uploadVideoLoading}
                       />
                     ) : (
-                      <ReactPlayer
-                        url={newVideoDetails.link}
-                        controls={true}
-                        light={newVideoDetails.image ?? true}
-                        width="100%"
-                        height="8rem"
-                      />
+                      <>
+                        <ReactPlayer
+                          url={newVideoDetails.link}
+                          controls={true}
+                          light={newVideoDetails.image ?? true}
+                          width="100%"
+                          height="8rem"
+                        />
+                        <p className="text-success mt-2 text-sm">You can edit this later.</p>
+                      </>
                     )}
                     {uploadVideoLoading ? (
                       <p className="text-sm text-center absolute uploader w-full">
@@ -419,7 +425,8 @@ const Videos = () => {
                   />
                 </div>
               </div>
-              <div className="modal-footer text-right">
+            </div>
+              <div className="modal-footer footed text-right">
                 <div
                   onClick={closeNewVideoModal}
                   className="btn btn-outline-secondary w-auto mr-2"
@@ -430,7 +437,6 @@ const Videos = () => {
                   Add New
                 </div>
               </div>
-            </div>
           </div>
         </CustomModal>
       )}
@@ -455,7 +461,7 @@ const Videos = () => {
         >
           <div className="modal-dialog modal-lg">
             <div className="modal-content">
-              <div className="modal-body grid grid-cols-12 gap-4 gap-y-3 mb-5">
+              <div className="modal-body grid grid-cols-12 gap-4 gap-y-3 mb-5 md:mb-0">
                 <div className="col-span-12 md:col-span-6">
                   <label htmlFor="modal-form-1" className="form-label">
                     Video Title
@@ -561,7 +567,7 @@ const Videos = () => {
                   <label htmlFor="modal-form-2" className="form-label">
                     Upload Video
                   </label>
-                  <div className="form-control p-0 h-32 bg-slate-200 relative" onClick={() => {
+                  <div className="form-control" onClick={() => {
                     !uploadVideoLoading && videoInput.current.click();
                   }}>
                       <input
@@ -573,21 +579,17 @@ const Videos = () => {
                         id="modal-form-2"
                         disabled={uploadVideoLoading}
                       />
-                      <ReactPlayer
-                        url={currentVideo.link}
-                        controls={true}
-                        light={currentVideo.image ?? true}
-                        width="100%"
-                        height="8rem"
-                      />
                     {uploadVideoLoading ? (
-                      <p className="text-sm text-center absolute uploader w-full">
-                        <UploadIcon className="mx-auto" />
+                      <p className="text-sm">
+                        <UploadIcon />
                       </p>
                     ) : (
-                      <p className="text-sm px-2 text-center text-slate-400 cursor-pointer absolute uploader w-full">Click here to upload</p>
+                      <p className="text-sm text-slate-400 cursor-pointer">Click here to upload</p>
                     )}
                   </div>
+                  <p className="mt-2 text-slate-500 text-sm">
+                    {message === "" ? "Note: No video preview." : message}
+                  </p>
                 </div>
                 <div className="col-span-12  md:col-span-6">
                   <label htmlFor="modal-form-2" className="form-label">
@@ -603,7 +605,8 @@ const Videos = () => {
                   />
                 </div>
               </div>
-              <div className="modal-footer text-right">
+            </div>
+              <div className="modal-footer footed text-right">
                 <div
                   onClick={() => {
                     setEditModal(false);
@@ -616,7 +619,6 @@ const Videos = () => {
                   Update
                 </div>
               </div>
-            </div>
           </div>
         </CustomModal>
       )}
@@ -645,10 +647,10 @@ const Videos = () => {
             <div className="flex flex-col sm:flex-row sm:items-end xl:items-start">
               <form
                 id="tabulator-html-filter-form"
-                className="flex w-full items-center justify-between"
+                className="flex flex-wrap w-full items-center justify-between lg:flex-nowrap"
               >
-                <div className="w-full flex md:w-1/2">
-                  <div className="sm:flex items-center sm:mr-8">
+                <div className="w-full sm:flex lg:w-1/2 justify-start items-center">
+                  <div className="sm:flex items-center mb-4 sm:mb-0 sm:mr-8">
                     <label className="w-12 flex-none xl:w-auto xl:flex-initial mr-2">
                       Category:
                     </label>
@@ -665,7 +667,7 @@ const Videos = () => {
                       ))}
                     </select>
                   </div>
-                  <div className="sm:flex items-center sm:mr-4 mt-2 xl:mt-0">
+                  <div className="sm:flex items-center mr-0">
                     <label className="w-12 flex-none xl:w-auto xl:flex-initial mr-2">
                       Region:
                     </label>
@@ -683,8 +685,8 @@ const Videos = () => {
                     </select>
                   </div>
                 </div>
-                <div className="w-full flex md:w-1/2 mt-4 md:mt-0">
-                  <div className="sm:flex w-full items-center sm:mr-4 mt-2 xl:mt-0">
+                <div className="w-full flex items-end lg:w-1/2 mt-4 lg:mt-0">
+                  <div className="sm:flex w-full items-center mr-4">
                     <label className="flex-none w-auto xl:flex-initial mr-2">
                       Search:
                     </label>
@@ -696,7 +698,7 @@ const Videos = () => {
                       value={searchVal}
                     />
                   </div>
-                  <div className="mt-2 xl:mt-0">
+                  <div className="">
                     <button
                       onClick={handleSearch}
                       id="tabulator-html-filter-go"
@@ -772,7 +774,8 @@ const Videos = () => {
                   </div>
                 </div>
                 <div className="tabulator-footer" style={{ marginTop: "1rem" }}>
-                  <span className="tabulator-paginator">
+                  <div className="tabulator-paginator flex justify-between">
+                    <div>
                     <label className="w-12 flex-none xl:w-auto xl:flex-initial mr-2">
                       Filter:
                     </label>
@@ -785,6 +788,8 @@ const Videos = () => {
                       <option value={20}>20</option>
                       <option value={50}>50</option>
                     </select>
+                    </div>
+                    <div>
                     <button
                       className="tabulator-page"
                       aria-label="Prev Page"
@@ -810,7 +815,8 @@ const Videos = () => {
                     >
                       Next
                     </button>
-                  </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
