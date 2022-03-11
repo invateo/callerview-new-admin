@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Layout from "../components/layout";
-import AxiosInstance from "../config/axios";
+import AxiosInstance, { base, gettoken } from "../config/axios";
 import { toast } from "react-toastify";
 import { switchLoading } from "../store/actions";
 import { useDispatch } from "react-redux";
 import { getLoggedinUser } from "./dashboard";
 import { CustomModal, ConfirmModal } from "../components/modal";
 import { ShowDropDown } from "../components/dropdown";
+import {ReactComponent as UploadIcon} from '../assets/icons/loader-2.svg';
+import ReactPlayer from "react-player";
+import axios from "axios";
 
 export const formatDate = (payload) => {
   let date = new Date(payload);
@@ -44,6 +47,10 @@ const Videos = () => {
   const [editModal, setEditModal] = useState(false);
   const [ currentVideoId, setCurrentVideoId] = useState("");
   const [currentVideo, setCurrentVideo] = useState();
+  const [uploadImgLoading, setUploadImgLoading] = useState(false);
+  const imageInput = useRef();
+  const [uploadVideoLoading, setUploadVideoLoading] = useState(false);
+  const videoInput = useRef();
 
   useEffect(() => {
     getVideos();
@@ -128,11 +135,25 @@ const Videos = () => {
 
   const closeNewVideoModal = () => {
     setNewVideoModal(false);
+    setNewVideoDetails({
+      name: "",
+      link: "",
+      category: "",
+      region: "",
+      releaseDate: "",
+      image: ""
+    })
   }
 
   const handleChangeInput = (e) => {
     setNewVideoDetails({
       ...newVideoDetails,
+      [e.target.name]: e.target.value
+    })
+  };
+  const handleChangeEditInput = (e) => {
+    setCurrentVideo({
+      ...currentVideo,
       [e.target.name]: e.target.value
     })
   };
@@ -142,20 +163,19 @@ const Videos = () => {
     setCurrentVideoId(id);
   }
   const deleteVideo = () => {
-    console.log("to delete video", currentVideoId);
-      // dispatch(switchLoading(true));
-      // AxiosInstance.delete(`/admin/delete/${currentAdminId}`)
-      // .then((res) => {
-      //   toast.success("Video deleted successfully");
-      //   setDeleteModal(false);
-      //   setCurrentAdminId("");
-      //   getAdmins();
-      // })
-      // .catch((err) => {
-      //   dispatch(switchLoading(false));
-      //   setDeleteModal(false);
-      //   toast.error(err?.response?.data?.message ?? "An unknown error occured.");
-      // });      
+      dispatch(switchLoading(true));
+      AxiosInstance.delete(`/video/delete/${currentVideoId}`)
+      .then((res) => {
+        toast.success("Video deleted successfully");
+        setDeleteModal(false);
+        setCurrentVideoId("");
+        getVideos();
+      })
+      .catch((err) => {
+        dispatch(switchLoading(false));
+        setDeleteModal(false);
+        toast.error(err?.response?.data?.message ?? "An unknown error occured.");
+      });     
   }
 
   const openEditModal = (payload) => {
@@ -166,20 +186,76 @@ const Videos = () => {
   }
 
   const editVideo = () => {
-    console.log("to edit video", currentVideo);
-    // dispatch(switchLoading(true));
-    //   AxiosInstance.put(`/admin/privilege/${currentAdminId}`, data)
-    //   .then((res) => {
-    //     toast.success("Admin privileges updated successfully");
-    //     setEditModal(false);
-    //     setCurrentAdminId("");
-    //     setCurrentAdminPrivilege([]);
-    //     getAdmins();
-    //   })
-    //   .catch((err) => {
-    //     dispatch(switchLoading(false));
-    //     toast.error(err?.response?.data?.message ?? "An unknown error occured.");
-    //   });
+    dispatch(switchLoading(true));
+      AxiosInstance.put(`/video/single/${currentVideo._id}`, currentVideo)
+      .then((res) => {
+        toast.success("Video updated successfully");
+        setEditModal(false);
+        setCurrentVideoId("");
+        setCurrentVideo();
+        getVideos();
+      })
+      .catch((err) => {
+        dispatch(switchLoading(false));
+        toast.error(err?.response?.data?.message ?? "An unknown error occured.");
+      });
+  }
+  const uploadFile = (e, type, setTypeLoading, video, setVideo) => {
+    const selectedFile = e.target.files[0];
+    let data = new FormData();
+    data.append("video", selectedFile);
+    
+    setTypeLoading(true);
+    axios({
+      url: `${base}/video/upload`,
+      method: "POST",
+      data,
+      headers: {
+        Authorization: `Bearer ${gettoken()}`,
+        "Content-Type": "multipart/form-data"
+      }
+    })
+    .then((res) => {
+      if (res.data.status === 200) {
+        setTypeLoading(false);
+        if (type === "img") {
+          setVideo({ ...video, image: res.data.url });
+        } else setVideo({ ...video, link: res.data.url });
+        // return false;
+      }
+    })
+    .catch((err) => {
+      setTypeLoading(false);
+      toast.error(err?.response?.data?.message ?? "An unknown error occured.");
+    });
+  }
+
+  const addNewVideo = () => {
+    if (
+      newVideoDetails.name.trim() === "" ||
+      newVideoDetails.category.trim() === "" ||
+      newVideoDetails.region.trim() === "" ||
+      newVideoDetails.releaseDate.trim() === "" ) {
+      toast.error("Please fill all fields!");
+    } else if (newVideoDetails.link.trim() === "" || newVideoDetails.image.trim() === "") {
+      toast.error("Please upload both the video and an image banner.");
+    } else {
+      dispatch(switchLoading(true));
+      AxiosInstance.post("/video/create", newVideoDetails)
+        .then(res => {
+          dispatch(switchLoading(false));
+          toast.success("New video created successfully");
+          setVideos([
+            ...videos,
+            res.data.data
+          ])
+          closeNewVideoModal();
+        })
+        .catch(error => {
+          dispatch(switchLoading(false));
+          toast.error(error.response.data? error.response.data.message : 'Unknown error');
+        });
+    }
   }
 
   return (
@@ -257,20 +333,31 @@ const Videos = () => {
                     ))}
                   </select>
                 </div>
-                <div className="col-span-12  md:col-span-">
+                <div className="col-span-12 md:col-span-6">
                   <label htmlFor="modal-form-2" className="form-label">
-                    Video URL
+                    Upload Image
                   </label>
-                  <input
-                    disabled
-                    value={newVideoDetails.link}
-                    id="modal-form-2"
-                    type="text"
-                    className="form-control"
-                    placeholder="https://videoURL.com"
-                  />
+                  <div className="form-control" onClick={() => {
+                    !uploadImgLoading && imageInput.current.click();
+                  }}>
+                    <input
+                      type="file"
+                      style={{ display: "none" }}
+                      onChange={(e) => uploadFile(e, "img", setUploadImgLoading, newVideoDetails, setNewVideoDetails)}
+                      accept="image/*"
+                      ref={imageInput}
+                      id="modal-form-2"
+                    />
+                    {uploadImgLoading ? (
+                      <p className="text-sm">
+                        <UploadIcon />
+                      </p>
+                    ) : (
+                      <p className="text-sm text-slate-400 cursor-pointer">Click here to upload</p>
+                    )}
+                  </div>
                 </div>
-                <div className="col-span-12  md:col-span-">
+                <div className="col-span-12  md:col-span-6">
                   <label htmlFor="modal-form-2" className="form-label">
                     Image URL
                   </label>
@@ -283,6 +370,54 @@ const Videos = () => {
                     placeholder="https://imageURL.com"
                   />
                 </div>
+                <div className="col-span-12 md:col-span-6">
+                  <label htmlFor="modal-form-2" className="form-label">
+                    Upload Video
+                  </label>
+                  <div className="form-control p-0 h-32 bg-slate-200 relative" onClick={() => {
+                    !uploadVideoLoading && videoInput.current.click();
+                  }}>
+                    {newVideoDetails.link === "" ? (
+                      <input
+                        type="file"
+                        style={{ display: "none" }}
+                        onChange={(e) => uploadFile(e, "video", setUploadVideoLoading, newVideoDetails, setNewVideoDetails)}
+                        accept="video/*"
+                        ref={videoInput}
+                        id="modal-form-2"
+                        disabled={uploadVideoLoading}
+                      />
+                    ) : (
+                      <ReactPlayer
+                        url={newVideoDetails.link}
+                        controls={true}
+                        light={newVideoDetails.image ?? true}
+                        width="100%"
+                        height="8rem"
+                      />
+                    )}
+                    {uploadVideoLoading ? (
+                      <p className="text-sm text-center absolute uploader w-full">
+                        <UploadIcon className="mx-auto" />
+                      </p>
+                    ) : (
+                      <p className="text-sm px-2 text-center text-slate-400 cursor-pointer absolute uploader w-full">Click here to upload</p>
+                    )}
+                  </div>
+                </div>
+                <div className="col-span-12  md:col-span-6">
+                  <label htmlFor="modal-form-2" className="form-label">
+                    Video URL
+                  </label>
+                  <input
+                    disabled
+                    value={newVideoDetails.link}
+                    id="modal-form-2"
+                    type="text"
+                    className="form-control"
+                    placeholder="https://videoURL.com"
+                  />
+                </div>
               </div>
               <div className="modal-footer text-right">
                 <div
@@ -291,7 +426,7 @@ const Videos = () => {
                 >
                   Cancel
                 </div>
-                <div onClick={() => {}} className="btn btn-primary w-auto">
+                <div onClick={addNewVideo} className="btn btn-primary w-auto">
                   Add New
                 </div>
               </div>
@@ -326,8 +461,8 @@ const Videos = () => {
                     Video Title
                   </label>
                   <input
-                    onChange={handleChangeInput}
-                    value={currentVideo.name}
+                    onChange={handleChangeEditInput}
+                    value={currentVideo?.name}
                     id="modal-form-1"
                     name="name"
                     type="text"
@@ -340,8 +475,8 @@ const Videos = () => {
                     Release Date
                   </label>
                   <input
-                    onChange={handleChangeInput}
-                    value={formatDate(currentVideo.releaseDate)}
+                    onChange={handleChangeEditInput}
+                    value={formatDate(currentVideo?.releaseDate)}
                     id="modal-form-1"
                     type="date"
                     name="releaseDate"
@@ -357,7 +492,7 @@ const Videos = () => {
                     name="category"
                     id="modal-form-1"
                     className="form-control form-select"
-                    onChange={handleChangeInput}
+                    onChange={handleChangeEditInput}
                   >
                     <option value="">Select one:</option>
                     {categories.map((el) => (
@@ -375,7 +510,7 @@ const Videos = () => {
                     name="region"
                     id="modal-form-1"
                     className="form-control form-select"
-                    onChange={handleChangeInput}
+                    onChange={handleChangeEditInput}
                   >
                     <option value="" >Select one:</option>
                     {regions.map((el, i) => (
@@ -385,20 +520,31 @@ const Videos = () => {
                     ))}
                   </select>
                 </div>
-                <div className="col-span-12  md:col-span-">
+                <div className="col-span-12 md:col-span-6">
                   <label htmlFor="modal-form-2" className="form-label">
-                    Video URL
+                    Upload Image
                   </label>
-                  <input
-                    disabled
-                    value={currentVideo.link}
-                    id="modal-form-2"
-                    type="text"
-                    className="form-control"
-                    placeholder="https://videoURL.com"
-                  />
+                  <div className="form-control" onClick={() => {
+                    !uploadImgLoading && imageInput.current.click();
+                  }}>
+                    <input
+                      type="file"
+                      style={{ display: "none" }}
+                      onChange={(e) => uploadFile(e, "img", setUploadImgLoading, currentVideo, setCurrentVideo)}
+                      accept="image/*"
+                      ref={imageInput}
+                      id="modal-form-2"
+                    />
+                    {uploadImgLoading ? (
+                      <p className="text-sm">
+                        <UploadIcon />
+                      </p>
+                    ) : (
+                      <p className="text-sm text-slate-400 cursor-pointer">Click here to upload</p>
+                    )}
+                  </div>
                 </div>
-                <div className="col-span-12  md:col-span-">
+                <div className="col-span-12  md:col-span-6">
                   <label htmlFor="modal-form-2" className="form-label">
                     Image URL
                   </label>
@@ -409,6 +555,51 @@ const Videos = () => {
                     type="text"
                     className="form-control"
                     placeholder="https://imageURL.com"
+                  />
+                </div>
+                <div className="col-span-12 md:col-span-6">
+                  <label htmlFor="modal-form-2" className="form-label">
+                    Upload Video
+                  </label>
+                  <div className="form-control p-0 h-32 bg-slate-200 relative" onClick={() => {
+                    !uploadVideoLoading && videoInput.current.click();
+                  }}>
+                      <input
+                        type="file"
+                        style={{ display: "none" }}
+                        onChange={(e) => uploadFile(e, "video", setUploadVideoLoading, currentVideo, setCurrentVideo)}
+                        accept="video/*"
+                        ref={videoInput}
+                        id="modal-form-2"
+                        disabled={uploadVideoLoading}
+                      />
+                      <ReactPlayer
+                        url={currentVideo.link}
+                        controls={true}
+                        light={currentVideo.image ?? true}
+                        width="100%"
+                        height="8rem"
+                      />
+                    {uploadVideoLoading ? (
+                      <p className="text-sm text-center absolute uploader w-full">
+                        <UploadIcon className="mx-auto" />
+                      </p>
+                    ) : (
+                      <p className="text-sm px-2 text-center text-slate-400 cursor-pointer absolute uploader w-full">Click here to upload</p>
+                    )}
+                  </div>
+                </div>
+                <div className="col-span-12  md:col-span-6">
+                  <label htmlFor="modal-form-2" className="form-label">
+                    Video URL
+                  </label>
+                  <input
+                    disabled
+                    value={currentVideo.link}
+                    id="modal-form-2"
+                    type="text"
+                    className="form-control"
+                    placeholder="https://videoURL.com"
                   />
                 </div>
               </div>
@@ -532,7 +723,7 @@ const Videos = () => {
                             <th className="whitespace-nowrap">Category</th>
                             <th className="whitespace-nowrap">Region</th>
                             <th className="whitespace-nowrap">Release Date</th>
-                            <th className="whitespace-nowrap">Banner</th>
+                            {/* <th className="whitespace-nowrap">Banner</th> */}
                             <th className="whitespace-nowrap">Video Preview</th>
                             {loggedinUser?.privileges?.includes("edit") && (
                               <th className="whitespace-nowrap text-right">
@@ -550,11 +741,17 @@ const Videos = () => {
                               <td className="whitespace-nowrap">
                                 {video.releaseDate}
                               </td>
-                              <td className="whitespace-nowrap w-24">
+                              {/* <td className="whitespace-nowrap w-24">
                                 <img className="object-contain" alt="video img" src={video.image} />
-                              </td>
-                              <td className="whitespace-nowrap w-24">
-                                <img className="object-contain" alt="video" src={video.link} />
+                              </td> */}
+                              <td className="whitespace-nowrap">
+                                <ReactPlayer
+                                  url={video.link}
+                                  controls={true}
+                                  light={video.image ?? true}
+                                  width="100%"
+                                  height="8rem"
+                                />
                               </td>
                               <td className="whitespace-nowrap">
                                   <ShowDropDown

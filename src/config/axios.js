@@ -1,10 +1,13 @@
 import axios from "axios";
-function gettoken() {
+
+export const gettoken = () => {
   let token = localStorage.getItem("CallerView-XXX") ?? null;
   return token;
 }
+export const base = "https://video-ringtone.herokuapp.com/api";
+
 let AxiosInstance = axios.create({
-  baseURL: "https://video-ringtone.herokuapp.com/api"
+  baseURL: base
 });
 
 AxiosInstance.defaults.headers = {
