@@ -73,7 +73,7 @@ const Dashboard = () => {
       <>
         <div className="top-bar mt-3">
           <div className="pt-10 pb-4">
-            <h2 className="text-2xl text-black font-medium truncate mr-5">
+            <h2 className="text-2xl text-black font-medium mr-5">
               Dashboard
             </h2>
           </div>
@@ -138,7 +138,7 @@ const Dashboard = () => {
               </div>
               <div className="col-span-12 lg:col-span-6 mt-6">
                 <div className="intro-y flex items-center justify-between mt-8">
-                  <h2 className="text-xl text-black font-medium truncate mr-5">
+                  <h2 className="text-xl text-black font-medium mr-5">
                     Video Statistics
                   </h2>
                     <div className="sm:w-auto sm:mt-0">

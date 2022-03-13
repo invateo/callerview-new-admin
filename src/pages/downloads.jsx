@@ -12,7 +12,7 @@ const Downloads = () => {
     total: 0,
     pages: 0,
     currPage: 1,
-    limit: 10
+    limit: 6
   })
   const [searchVal, setsearchVal] = useState("");
 
@@ -76,7 +76,7 @@ const Downloads = () => {
       <>
         <div className="top-bar mt-3">
           <div className="pt-10 pb-4">
-            <h2 className="text-2xl text-black font-medium truncate mr-5">
+            <h2 className="text-2xl text-black font-medium  mr-5">
               Video Downloads
             </h2>
           </div>
@@ -149,9 +149,9 @@ const Downloads = () => {
                     aria-label="Page Size"
                     onChange={handleSelectLimit}
                   >
+                    <option value={6}>6</option>
                     <option value={10}>10</option>
                     <option value={20}>20</option>
-                    <option value={50}>50</option>
                   </select>
                   <button
                     className="tabulator-page"

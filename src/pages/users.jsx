@@ -16,7 +16,7 @@ const Users = () => {
     total: 0,
     pages: 0,
     currPage: 1,
-    limit: 10
+    limit: 6
   })
   const [searchVal, setsearchVal] = useState("");
 
@@ -283,13 +283,13 @@ const Users = () => {
         <>
           <div className="top-bar mt-3">
             <div className="pt-10 pb-4">
-              <h2 className="text-2xl text-black font-medium truncate mr-5">
-                Users Management (to be edited with correct endpoints)
+              <h2 className="text-2xl text-black font-medium  mr-5">
+                Users Management <span className="text-sm">(to be edited with correct endpoints)</span>
               </h2>
             </div>
           </div>
           <div className="intro-y flex items-center justify-between mt-8">
-            <h2 className="text-xl text-black font-medium truncate mr-5">
+            <h2 className="text-xl text-black font-medium  mr-5">
               All Users
             </h2>
             {(loggedinAdmin?.privileges?.includes("create") || loggedinAdmin?.privileges?.includes("super admin")) && (
@@ -390,9 +390,9 @@ const Users = () => {
                       aria-label="Page Size"
                       onChange={handleSelectLimit}
                     >
+                      <option value={6}>6</option>
                       <option value={10}>10</option>
                       <option value={20}>20</option>
-                      <option value={50}>50</option>
                     </select>
                     </div>
                     <div>

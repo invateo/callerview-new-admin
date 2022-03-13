@@ -8,7 +8,8 @@ export const CustomModal = ({
   modalIsOpen,
   afterOpenModal,
   closeModal,
-  shortModal
+  shortModal,
+  classes
 }) => {
   return (
     <div>
@@ -18,7 +19,7 @@ export const CustomModal = ({
         onRequestClose={closeModal}
         contentLabel="Modal"
         style={{marginTop: "-4rem"}}
-        className={`postionmoal relative ${shortModal ? "deleteassets" : "Addassets"}`}
+        className={`postionmoal relative ${shortModal ? "deleteassets" : "Addassets"} ${classes}`}
         overlayClassName={"GeneralOverlay"}
       >
         <div className="modal-dialog">

@@ -12,12 +12,12 @@ import Regions from "./pages/settings/regions";
 import Login from "./pages/auth";
 import ResetPassword from "./pages/auth/reset-password";
 import ForgotPassword from "./pages/auth/forgot-password";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { getLoggedinUser } from "./store/actions";
 
 const App = () => {
   const dispatch = useDispatch();
-  const { loggedinAdmin } = useSelector( state => state.utility);
+  // const { loggedinAdmin } = useSelector( state => state.utility);
   let token = localStorage.getItem("CallerView-XXX");
 
   useEffect(() => {
@@ -46,7 +46,8 @@ const App = () => {
                   <Route path="/downloads" component={Downloads} />
                   <Route path="/categories" component={Categories} />
                   <Route path="/regions" component={Regions} />
-                  {loggedinAdmin?.privileges?.includes("super admin") ? <Route path="/settings" component={Settings} /> : <Redirect to="/dashboard" />}
+                  <Route path="/settings" component={Settings}/>
+                  {/* <Route path="/settings">{loggedinAdmin?.privileges?.includes("super admin") ?  <Settings /> : <Redirect to="/dashboard" />}</Route> */}
                 </>
               )}
               <Route component={() => <Redirect to="/" />} />

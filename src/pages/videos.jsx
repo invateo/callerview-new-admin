@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { CustomModal, ConfirmModal } from "../components/modal";
 import { ShowDropDown } from "../components/dropdown";
 import {ReactComponent as UploadIcon} from '../assets/icons/loader-2.svg';
+import {ReactComponent as AlertIcon} from '../assets/icons/alert.svg';
 import ReactPlayer from "react-player";
 import axios from "axios";
 
@@ -29,11 +30,13 @@ const Videos = () => {
     total: 0,
     pages: 0,
     currPage: 1,
-    limit: 10
+    limit: 6
   })
   const [searchVal, setsearchVal] = useState("");
 
   const [newVideoModal, setNewVideoModal] = useState(false);
+  const [newCSVModal, setNewCSVModal] = useState(false);
+  const [CSVContent, setCSVContent] = useState([]);
   const [newVideoDetails, setNewVideoDetails] = useState({
     name: "",
     link: "",
@@ -51,6 +54,7 @@ const Videos = () => {
   const imageInput = useRef();
   const [uploadVideoLoading, setUploadVideoLoading] = useState(false);
   const videoInput = useRef();
+  const CSVInput = useRef();
 
   useEffect(() => {
     getVideos();
@@ -120,15 +124,31 @@ const Videos = () => {
   const handleCategoryFilter = (e) => {
     const val = e.target.value;
     if (val !== "all") {
-      let filteredVideos = videos.filter((el) => el.category === val);
-      setVideos(filteredVideos);
+      dispatch(switchLoading(true));
+      AxiosInstance.get(`/video/all?c=${val}`)
+        .then(res => { 
+          setVideos([...res.data.data.videos]);
+          dispatch(switchLoading(false));
+        })
+        .catch(error => {
+          dispatch(switchLoading(false));
+          toast.error(error.response.data? error.response.data.message : 'Unknown error');
+        });
     } else getVideos();
   }
   const handleRegionFilter = (e) => {
     const val = e.target.value;
     if (val !== "all") {
-      let filteredVideos = videos.filter((el) => el.region === val);
-      setVideos(filteredVideos);
+      dispatch(switchLoading(true));
+      AxiosInstance.get(`/video/region?r=${val}`)
+        .then(res => { 
+          setVideos([...res.data.data.videos]);
+          dispatch(switchLoading(false));
+        })
+        .catch(error => {
+          dispatch(switchLoading(false));
+          toast.error(error.response.data? error.response.data.message : 'Unknown error');
+        });
     } else getVideos();
   }
 
@@ -142,6 +162,10 @@ const Videos = () => {
       releaseDate: "",
       image: ""
     })
+  }
+  const closeCSVModal = () => {
+    setNewCSVModal(false);
+    setCSVContent([]);
   }
 
   const handleChangeInput = (e) => {
@@ -180,8 +204,6 @@ const Videos = () => {
   const openEditModal = (payload) => {
     setEditModal(true);
     setCurrentVideo(payload);
-    console.log("curr video", payload);
-    //more
   }
 
   const editVideo = () => {
@@ -259,6 +281,48 @@ const Videos = () => {
     }
   }
 
+  const uploadCSV = e => {
+    let reader = new FileReader();
+    let content = "";
+    let target = e.target;
+
+    reader.onload = _e => {
+      let file_content = _e.target.result.split(",");
+      content = window.atob(file_content[1]);
+      // let contentHead = content.split("\n")[0].split(",");
+      let contentBody = content.split("\n").slice(1).map(el => ({...el.split(",")}))
+      setCSVContent(contentBody);
+      setNewCSVModal(true);
+    };
+    reader.readAsDataURL(target.files[0]);
+  };
+
+  const addVideos = () => {
+    const videosToUpload = CSVContent.map(video => ({
+      name: video[0],
+      category: video[1],
+      region: video[2],
+      releaseDate: video[3],
+      link: video[4],
+      image: video[5]
+    }))
+    const data = {
+      videos: videosToUpload
+    }
+    dispatch(switchLoading(true));
+    AxiosInstance.post("/video/insert/many", data)
+        .then(res => {
+          dispatch(switchLoading(false));
+          toast.success("Videos uploaded successfully");
+          closeCSVModal();
+          getVideos();
+        })
+        .catch(error => {
+          dispatch(switchLoading(false));
+          toast.error(error.response.data? error.response.data.message : 'Unknown error');
+        });
+  }
+
   return (
     <>  
       {newVideoModal && (
@@ -267,9 +331,9 @@ const Videos = () => {
           closeModal={closeNewVideoModal}
           headerTitle={"Add New Video"}
         >
-          <div className="modal-dialog modal-lg">
+          <div className="modal-dialog">
             <div className="modal-content">
-              <div className="modal-body grid grid-cols-12 gap-4 gap-y-3 mb-5 md:mb-0">
+              <div className="modal-body grid grid-cols-12 gap-4 gap-y-3 mt-12 mb-5 md:mb-0">
                 <div className="col-span-12 md:col-span-6">
                   <label htmlFor="modal-form-1" className="form-label">
                     Video Title
@@ -457,9 +521,9 @@ const Videos = () => {
           }}
           headerTitle={"Edit Video Details"}
         >
-          <div className="modal-dialog modal-lg">
+          <div className="modal-dialog">
             <div className="modal-content">
-              <div className="modal-body grid grid-cols-12 gap-4 gap-y-3 mb-5 md:mb-0">
+              <div className="modal-body grid grid-cols-12 gap-4 gap-y-3 mt-12 mb-5 md:mb-0">
                 <div className="col-span-12 md:col-span-6">
                   <label htmlFor="modal-form-1" className="form-label">
                     Video Title
@@ -620,24 +684,126 @@ const Videos = () => {
           </div>
         </CustomModal>
       )}
+      {newCSVModal && (
+        <CustomModal
+          modalIsOpen={newCSVModal}
+          closeModal={(closeCSVModal)}
+          headerTitle={"Add Videos via CSV"}
+          classes="modal-lg"
+        >
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-body mb-5 mt-12 md:mb-0">
+                <div className="mb-4 flex text-md alert alert-primary-soft show">
+                  <AlertIcon className="mr-2 w-12"/> 
+                  <div>
+                    Your table should have the following columns in the order:
+                    <span className="font-semibold"> name, category, region, releaseDate, link, image.</span>
+                    <p className="mt-2">Inspect the table below and if the data does not match the required content, <span className="font-semibold">PLEASE DO NOT PROCEED. </span>Kindly upload another file with the right format.</p>
+                  </div>
+                  </div>
+                  {CSVContent?.length > 10 ? (
+                  <p className="mb-4 font-semibold text-md">Found {CSVContent?.length} rows. Displaying only 10.</p>
+                  ) : (
+                    <p className="mb-4 font-semibold text-md">Found {CSVContent?.length} rows.</p>
+                  )}
+                <div id="responsive-table">
+                  {CSVContent?.length === 0 ? (
+                    <div className="w-full text-center my-10">No videos found.</div>
+                  ) : (
+                    <div className="overflow-x-auto scroll-table">
+                      <table className="table">
+                        <thead>
+                          <tr>
+                            <th className="whitespace-nowrap">Name</th>
+                            <th className="whitespace-nowrap">Category</th>
+                            <th className="whitespace-nowrap">Region</th>
+                            <th className="whitespace-nowrap">Release Date</th>
+                            <th className="whitespace-nowrap">Video Link</th>
+                            <th className="whitespace-nowrap">Image Link</th>
+                          </tr>
+                        </thead>     
+                          <tbody>
+                            {CSVContent?.slice(0,10).map((video, i) => (
+                              <tr key={`video-${i}`}>
+                                <td className="whitespace-nowrap">{video[0]}</td>
+                                <td className="whitespace-nowrap">{video[1]}</td>
+                                <td className="whitespace-nowrap">{video[2]}</td>
+                                <td className="whitespace-nowrap">
+                                  {video[3]}
+                                </td>
+                                <td className="whitespace-nowrap">
+                                  {video[4]}
+                                </td>
+                                <td className="whitespace-nowrap">
+                                  {video[5]}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+              <div className="modal-footer footed text-right">
+                <div
+                  onClick={closeCSVModal}
+                  className="btn btn-outline-secondary w-auto mr-2"
+                >
+                  Cancel
+                </div>
+                {CSVContent?.length !== 0 && (
+                  <div onClick={addVideos} className="btn btn-primary w-auto">
+                    Confirm
+                  </div>
+                )}
+              </div>
+          </div>
+        </CustomModal>
+      )}
+
       <Layout title="Videos">
         <>
           <div className="top-bar mt-3">
             <div className="pt-10 pb-4">
-              <h2 className="text-2xl text-black font-medium truncate mr-5">
+              <h2 className="text-2xl text-black font-medium mr-5">
                 Videos (Free)
               </h2>
             </div>
           </div>
-          <div className="intro-y flex items-center justify-between mt-8">
-            <h2 className="text-xl text-black font-medium truncate mr-5">
+          <div className="intro-y flex flex-wrap sm:flex-nowrap items-center justify-between mt-8">
+            <h2 className="w-full sm:w-auto text-xl text-black font-medium mr-5">
               All Videos
             </h2>
             {(loggedinUser?.privileges?.includes("create") || loggedinUser?.privileges?.includes("super admin")) && (
-              <div className="sm:w-auto sm:mt-0">
-                <div className="btn btn-primary shadow-md" onClick={() => setNewVideoModal(true)}>
-                  Add New Video
+              <div className="flex mt-4 sm:mt-0">
+                <div className="sm:w-auto sm:mt-0 mr-3">
+                  <div className="btn btn-primary shadow-md" onClick={() => setNewVideoModal(true)}>
+                    Add New Video
+                  </div>
                 </div>
+                <div className="sm:w-auto sm:mt-0" onClick={() => CSVInput.current.click()}>
+                    <input
+                      type="file"
+                      style={{ display: "none" }}
+                      onChange={uploadCSV}
+                      accept="text/csv"
+                      ref={CSVInput}
+                      id="modal-form-2"
+                    />
+                    {uploadImgLoading ? (
+                      <div className="btn btn-green shadow-md">
+                        <UploadIcon />
+                      </div>
+                    ) : (
+                      <div className="btn btn-green shadow-md">
+                        Add via CSV
+                      </div>
+                    )}
+                </div>
+
               </div>
             )}
           </div>
@@ -784,9 +950,9 @@ const Videos = () => {
                       aria-label="Page Size"
                       onChange={handleSelectLimit}
                     >
+                      <option value={6}>6</option>
                       <option value={10}>10</option>
                       <option value={20}>20</option>
-                      <option value={50}>50</option>
                     </select>
                     </div>
                     <div>

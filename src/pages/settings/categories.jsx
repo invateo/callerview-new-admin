@@ -116,13 +116,13 @@ const Categories = () => {
         <>
           <div className="top-bar mt-3">
             <div className="pt-10 pb-4">
-              <h2 className="text-2xl text-black font-medium truncate mr-5">
+              <h2 className="text-2xl text-black font-medium mr-5">
                 Category Listings
               </h2>
             </div>
           </div>
           <div className="intro-y flex items-center justify-between mt-8">
-            <h2 className="text-xl text-black font-medium truncate mr-5">
+            <h2 className="text-xl text-black font-medium mr-5">
               All Categories
             </h2>
             {(loggedinUser?.privileges?.includes("create") || loggedinUser?.privileges?.includes("super admin")) && (

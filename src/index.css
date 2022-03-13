@@ -221,6 +221,9 @@ body {
 .Addassets .modal-dialog {
   height: calc(100% - 15px);
 }
+.modal-lg {
+  width: 650px;
+}
 .deleteassets {
   height: fit-content !important;
   margin-top: 0;
@@ -287,5 +290,10 @@ body {
   }
   .modal-body {
     margin-bottom: 0 !important;
+    margin-top: 0 !important;
   }
+}
+.scroll-table {
+  max-height: 350px;
+  overflow-y: scroll;
 }
