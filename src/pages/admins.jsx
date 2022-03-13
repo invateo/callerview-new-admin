@@ -4,12 +4,12 @@ import AxiosInstance from "../config/axios";
 import { toast } from "react-toastify";
 import { CustomModal, ConfirmModal } from "../components/modal";
 import { switchLoading } from "../store/actions";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { ShowDropDown } from "../components/dropdown";
 
 const Admin = () => {
   const dispatch = useDispatch();
-  const [loggedinUser, setLoggedinUser] = useState();
+  const { loggedinAdmin: loggedinUser } = useSelector( state => state.utility);
   const [admins, setAdmins] = useState([]);
   const [newAdmin, setNewAdmin] = useState({
     name: "",
@@ -33,12 +33,8 @@ const Admin = () => {
     AxiosInstance.get("/admin/all")
       .then((res) => {
         const admins = res.data.data;
-        AxiosInstance.get("/admin").then((res) => {
-          dispatch(switchLoading(false));
-          setLoggedinUser({email: res.data.data.admin.email, privileges: res.data.data.privilege?.name});
-          const loggedin = res.data.data.admin.email;
-          setAdmins(admins.filter((el) => el.email !== loggedin));
-        });
+        setAdmins(admins.filter((el) => el.email !== loggedinUser?.email));
+        dispatch(switchLoading(false));
       })
       .catch((err) => {
         dispatch(switchLoading(false));
@@ -332,7 +328,7 @@ const Admin = () => {
             <h2 className="text-xl text-black font-medium truncate mr-5">
               All Admins
             </h2>
-            {loggedinUser?.privileges?.includes("create") && (
+            {(loggedinUser?.privileges?.includes("create") || loggedinUser?.privileges?.includes("super admin")) && (
             <div className="sm:w-auto sm:mt-0">
               <div
                 className="btn btn-primary shadow-md"
@@ -355,9 +351,11 @@ const Admin = () => {
                         <th className="whitespace-nowrap">Username</th>
                         <th className="whitespace-nowrap">Email</th>
                         <th className="whitespace-nowrap">Privileges</th>
-                        <th className="whitespace-nowrap text-right">
-                          Actions
-                        </th>
+                        {(loggedinUser?.privileges?.includes("edit") || loggedinUser?.privileges?.includes("super admin")) && (
+                          <th className="whitespace-nowrap text-right">
+                            Actions
+                          </th>
+                        )}
                       </tr>
                     </thead>
                     <tbody>
@@ -379,17 +377,19 @@ const Admin = () => {
                               </span>
                             ))}
                           </td>
-                          <td className="whitespace-nowrap">
-                              <ShowDropDown
-                                openDeleteModal={() => {
-                                  confirmDelete(admin._id);
-                                }}
-                                openEditModal={() => {
-                                  openEditModal(admin._id, admin.privileges);
-                                }}
-                                access={loggedinUser?.privileges?.includes("super admin")}
-                              />
-                          </td>
+                          {(loggedinUser?.privileges?.includes("edit") || loggedinUser?.privileges?.includes("super admin")) && (
+                            <td className="whitespace-nowrap">
+                                <ShowDropDown
+                                  openDeleteModal={() => {
+                                    confirmDelete(admin._id);
+                                  }}
+                                  openEditModal={() => {
+                                    openEditModal(admin._id, admin.privileges);
+                                  }}
+                                  access={loggedinUser?.privileges?.includes("super admin")}
+                                />
+                            </td>
+                          )}
                         </tr>
                       ))}
                     </tbody>

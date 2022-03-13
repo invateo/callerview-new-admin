@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { ReactComponent as Logo } from "../assets/icons/logo.svg";
 import { ReactComponent as BurgerIcon } from "../assets/icons/burger-menu.svg";
 import { ReactComponent as DashboardIcon } from "../assets/icons/dashboard.svg";
@@ -14,6 +15,7 @@ import { ReactComponent as LogoutIcon } from "../assets/icons/logout.svg";
 import PageTitle from "./pageTitle";
 
 const Layout = ({ title, children }) => {
+  const { loggedinAdmin } = useSelector( state => state.utility);
   const [show, setShow] = useState(false);
   const toggleMenu = () => {
     setShow((val) => !val);
@@ -135,19 +137,21 @@ const Layout = ({ title, children }) => {
                 <div className="menu__title"> Regions </div>
               </NavLink>
             </li>
-            <li onClick={() => setShow(false)}>
-              <NavLink
-                exact
-                to="/settings"
-                className="menu"
-                activeClassName="menu--active"
-              >
-                <div className="menu__icon">
-                  <SettingsIcon />
-                </div>
-                <div className="menu__title"> Settings </div>
-              </NavLink>
-            </li>
+            {loggedinAdmin?.privileges?.includes("super admin") && (
+              <li onClick={() => setShow(false)}>
+                <NavLink
+                  exact
+                  to="/settings"
+                  className="menu"
+                  activeClassName="menu--active"
+                >
+                  <div className="menu__icon">
+                    <SettingsIcon />
+                  </div>
+                  <div className="menu__title"> Settings </div>
+                </NavLink>
+              </li>
+            )}
             <li className="menu__devider my-6"></li>
 
             <li>
@@ -272,19 +276,21 @@ const Layout = ({ title, children }) => {
                   <div className="side-menu__title"> Regions </div>
                 </NavLink>
               </li>
-              <li>
-                <NavLink
-                  exact
-                  to="/settings"
-                  className="side-menu"
-                  activeClassName="side-menu--active"
-                >
-                  <div className="side-menu__icon">
-                    <SettingsIcon />
-                  </div>
-                  <div className="side-menu__title"> Settings </div>
-                </NavLink>
-              </li>
+              {loggedinAdmin?.privileges?.includes("super admin") && (
+                <li>
+                  <NavLink
+                    exact
+                    to="/settings"
+                    className="side-menu"
+                    activeClassName="side-menu--active"
+                  >
+                    <div className="side-menu__icon">
+                      <SettingsIcon />
+                    </div>
+                    <div className="side-menu__title"> Settings </div>
+                  </NavLink>
+                </li>
+              )}
               <li className="side-nav__devider my-6"></li>
               <li>
                 <div

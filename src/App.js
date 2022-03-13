@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { BrowserRouter as Router, Route, Redirect, Switch } from "react-router-dom";
 import Dashboard from "./pages/dashboard";
 import Admin from "./pages/admins";
@@ -11,9 +12,21 @@ import Regions from "./pages/settings/regions";
 import Login from "./pages/auth";
 import ResetPassword from "./pages/auth/reset-password";
 import ForgotPassword from "./pages/auth/forgot-password";
+import { useDispatch, useSelector } from "react-redux";
+import { getLoggedinUser } from "./store/actions";
 
 const App = () => {
+  const dispatch = useDispatch();
+  const { loggedinAdmin } = useSelector( state => state.utility);
   let token = localStorage.getItem("CallerView-XXX");
+
+  useEffect(() => {
+    if (token) {
+      dispatch(getLoggedinUser());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
         return (
           <Router>
             <Switch>
@@ -33,7 +46,7 @@ const App = () => {
                   <Route path="/downloads" component={Downloads} />
                   <Route path="/categories" component={Categories} />
                   <Route path="/regions" component={Regions} />
-                  <Route path="/settings" component={Settings} />
+                  {loggedinAdmin?.privileges?.includes("super admin") ? <Route path="/settings" component={Settings} /> : <Redirect to="/dashboard" />}
                 </>
               )}
               <Route component={() => <Redirect to="/" />} />

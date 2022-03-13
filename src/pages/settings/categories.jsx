@@ -4,20 +4,18 @@ import AxiosInstance from "../../config/axios";
 import { toast } from "react-toastify";
 import { CustomModal } from "../../components/modal";
 import { switchLoading } from "../../store/actions";
-import { useDispatch } from "react-redux";
-import { getLoggedinUser } from "../dashboard";
+import { useDispatch, useSelector } from "react-redux";
 import { formatDate } from "../videos";
 
 const Categories = () => {
   const dispatch = useDispatch();
-  const [loggedinUser, setLoggedinUser] = useState();
+  const { loggedinAdmin: loggedinUser } = useSelector( state => state.utility);
   const [categories, setCategories] = useState([]);
   const [addNewModal, setAddNewModal] = useState(false);
   const [name, setName] = useState("");
 
   useEffect(() => {
     getCategories();
-    getLoggedinUser(dispatch, setLoggedinUser);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -127,7 +125,7 @@ const Categories = () => {
             <h2 className="text-xl text-black font-medium truncate mr-5">
               All Categories
             </h2>
-            {loggedinUser?.privileges?.includes("create") && (
+            {(loggedinUser?.privileges?.includes("create") || loggedinUser?.privileges?.includes("super admin")) && (
               <div className="sm:w-auto sm:mt-0">
                 <div
                   className="btn btn-primary shadow-md"

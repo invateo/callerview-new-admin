@@ -3,8 +3,7 @@ import Layout from "../components/layout";
 import AxiosInstance, { base, gettoken } from "../config/axios";
 import { toast } from "react-toastify";
 import { switchLoading } from "../store/actions";
-import { useDispatch } from "react-redux";
-import { getLoggedinUser } from "./dashboard";
+import { useDispatch, useSelector } from "react-redux";
 import { CustomModal, ConfirmModal } from "../components/modal";
 import { ShowDropDown } from "../components/dropdown";
 import {ReactComponent as UploadIcon} from '../assets/icons/loader-2.svg';
@@ -22,7 +21,7 @@ export const formatDate = (payload) => {
 
 const Videos = () => {
   const dispatch = useDispatch();
-  const [loggedinUser, setLoggedinUser] = useState();
+  const { loggedinAdmin: loggedinUser } = useSelector( state => state.utility);
   const [categories, setCategories] = useState([]);
   const [regions, setRegions] = useState([]);
   const [videos, setVideos] = useState([]);
@@ -55,7 +54,6 @@ const Videos = () => {
 
   useEffect(() => {
     getVideos();
-    getLoggedinUser(dispatch, setLoggedinUser);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -635,7 +633,7 @@ const Videos = () => {
             <h2 className="text-xl text-black font-medium truncate mr-5">
               All Videos
             </h2>
-            {loggedinUser?.privileges?.includes("create") && (
+            {(loggedinUser?.privileges?.includes("create") || loggedinUser?.privileges?.includes("super admin")) && (
               <div className="sm:w-auto sm:mt-0">
                 <div className="btn btn-primary shadow-md" onClick={() => setNewVideoModal(true)}>
                   Add New Video
@@ -693,7 +691,7 @@ const Videos = () => {
                     <input
                       type="text"
                       className="form-control w-full mt-2 sm:mt-0"
-                      placeholder="Search..."
+                      placeholder="Search by video title..."
                       onChange={(e) => setsearchVal(e.target.value)}
                       value={searchVal}
                     />
@@ -727,7 +725,7 @@ const Videos = () => {
                             <th className="whitespace-nowrap">Release Date</th>
                             {/* <th className="whitespace-nowrap">Banner</th> */}
                             <th className="whitespace-nowrap">Video Preview</th>
-                            {loggedinUser?.privileges?.includes("edit") && (
+                            {(loggedinUser?.privileges?.includes("edit") || loggedinUser?.privileges?.includes("super admin")) && (
                               <th className="whitespace-nowrap text-right">
                                 Actions
                               </th>
@@ -755,17 +753,19 @@ const Videos = () => {
                                   height="8rem"
                                 />
                               </td>
-                              <td className="whitespace-nowrap">
-                                  <ShowDropDown
-                                    openDeleteModal={() => {
-                                      confirmDelete(video._id);
-                                    }}
-                                    openEditModal={() => {
-                                      openEditModal(video);
-                                    }}
-                                    access={loggedinUser?.privileges?.includes("super admin")}
-                                  />
-                              </td>
+                              {(loggedinUser?.privileges?.includes("edit") || loggedinUser?.privileges?.includes("super admin")) && (
+                                <td className="whitespace-nowrap">
+                                    <ShowDropDown
+                                      openDeleteModal={() => {
+                                        confirmDelete(video._id);
+                                      }}
+                                      openEditModal={() => {
+                                        openEditModal(video);
+                                      }}
+                                      access={loggedinUser?.privileges?.includes("super admin")}
+                                    />
+                                </td>
+                              )}
                             </tr>
                           ))}
                         </tbody>
