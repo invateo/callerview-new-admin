@@ -16,16 +16,16 @@ const storeLoggedinUser = (payload) => (dispatch) => {
 };
 
 export const getLoggedinUser = () => (dispatch) => {
-  dispatch(switchLoading(true));
+  // dispatch(switchLoading(true));
   AxiosInstance.get("/admin").then((res) => {
-    dispatch(switchLoading(false));
+    // dispatch(switchLoading(false));
     dispatch(storeLoggedinUser({
       email: res.data.data.admin.email, 
       privileges: res.data.data.privilege?.name
     }));
   })
   .catch((err) => {
-    dispatch(switchLoading(false));
+    // dispatch(switchLoading(false));
     toast.error(
       err?.response?.data?.message ?? "An unknown error occured."
     );

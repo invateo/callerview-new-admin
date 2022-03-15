@@ -6,7 +6,7 @@ import { switchLoading } from "../store/actions";
 import { useDispatch, useSelector } from "react-redux";
 import { CustomModal, ConfirmModal } from "../components/modal";
 import { ShowDropDown } from "../components/dropdown";
-// import {formatDate} from './videos';
+import {formatDate} from './videos';
 
 const Users = () => {
   const dispatch = useDispatch();
@@ -16,18 +16,18 @@ const Users = () => {
     total: 0,
     pages: 0,
     currPage: 1,
-    limit: 6
+    limit: 5
   })
   const [searchVal, setsearchVal] = useState("");
 
   const [newUserModal, setNewUserModal] = useState(false);
-  const [newUserDetails, setNewUserDetails] = useState({ //needs to change
+  const [newUserDetails, setNewUserDetails] = useState({
+    email: "",
+    phoneNumber: "",
+    password: "",
     name: "",
-    link: "",
-    category: "",
-    region: "",
-    releaseDate: "",
-    image: ""
+    pin: "",
+    phoneIMEI: ""
   });
   const [deleteModal, setDeleteModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
@@ -46,11 +46,16 @@ const Users = () => {
     }
     else {
       dispatch(switchLoading(true));
-      AxiosInstance.get(`/video/search?q=${searchVal}`)
+      AxiosInstance.get(`/user/search?q=${searchVal}`)
         .then(res => { 
           setUsers([...res.data.data]);
+          setMeta({
+            ...meta,
+            total: res.data.data.length,
+            currPage: 1,
+            pages: 1
+          })
           dispatch(switchLoading(false));
-          setsearchVal("");
         })
         .catch(error => {
           dispatch(switchLoading(false));
@@ -60,6 +65,7 @@ const Users = () => {
   }
   const handleSelectLimit = (e) => {
     const val = e.target.value;
+    setsearchVal("");
     setMeta({...meta, limit: val});
     getUsers(meta.currPage, val);
   }
@@ -71,10 +77,10 @@ const Users = () => {
 
   const getUsers = (page, limit) => {
     dispatch(switchLoading(true));
-    AxiosInstance.get(`/video/view/${page ?? meta.currPage}?limit=${limit ?? meta.limit}`)
+    AxiosInstance.get(`/user/view/${page ?? meta.currPage}?limit=${limit ?? meta.limit}`)
       .then((res) => {
         const result = res.data.data;
-        setUsers([...result?.video]);
+        setUsers([...result?.users]);
         setMeta({
           ...meta,
           total: result?.count,
@@ -120,7 +126,7 @@ const Users = () => {
   }
   const deleteUser = () => {
       dispatch(switchLoading(true));
-      AxiosInstance.delete(`/video/delete/${CurrentUserId}`)
+      AxiosInstance.delete(`/user/delete/${CurrentUserId}`)
       .then((res) => {
         toast.success("User deleted successfully");
         setDeleteModal(false);
@@ -142,7 +148,7 @@ const Users = () => {
 
   const editUser = () => {
     dispatch(switchLoading(true));
-      AxiosInstance.put(`/video/single/${currentUser._id}`, currentUser)
+      AxiosInstance.put(`/user/single/${currentUser._id}`, currentUser)
       .then((res) => {
         toast.success("User details updated successfully");
         setEditModal(false);
@@ -157,31 +163,31 @@ const Users = () => {
   }
 
   const addNewUser = () => {
-    if (
-      newUserDetails.name.trim() === "" ||
-      newUserDetails.category.trim() === "" ||
-      newUserDetails.region.trim() === "" ||
-      newUserDetails.releaseDate.trim() === "" ) {
-      toast.error("Please fill all fields!");
-    } else if (newUserDetails.link.trim() === "" || newUserDetails.image.trim() === "") {
-      toast.error("Please upload both the video and an image banner.");
-    } else {
-      dispatch(switchLoading(true));
-      AxiosInstance.post("/video/create", newUserDetails)
-        .then(res => {
-          dispatch(switchLoading(false));
-          toast.success("New user created successfully");
-          setUsers([
-            ...users,
-            res.data.data
-          ])
-          closenewUserModal();
-        })
-        .catch(error => {
-          dispatch(switchLoading(false));
-          toast.error(error.response.data? error.response.data.message : 'Unknown error');
-        });
-    }
+    // if (
+    //   newUserDetails.name.trim() === "" ||
+    //   newUserDetails.category.trim() === "" ||
+    //   newUserDetails.region.trim() === "" ||
+    //   newUserDetails.releaseDate.trim() === "" ) {
+    //   toast.error("Please fill all fields!");
+    // } else if (newUserDetails.link.trim() === "" || newUserDetails.image.trim() === "") {
+    //   toast.error("Please upload both the video and an image banner.");
+    // } else {
+    //   dispatch(switchLoading(true));
+    //   AxiosInstance.post("/video/create", newUserDetails)
+    //     .then(res => {
+    //       dispatch(switchLoading(false));
+    //       toast.success("New user created successfully");
+    //       setUsers([
+    //         ...users,
+    //         res.data.data
+    //       ])
+    //       closenewUserModal();
+    //     })
+    //     .catch(error => {
+    //       dispatch(switchLoading(false));
+    //       toast.error(error.response.data? error.response.data.message : 'Unknown error');
+    //     });
+    // }
   }
 
   return (
@@ -197,11 +203,11 @@ const Users = () => {
               <div className="modal-body grid grid-cols-12 gap-4 gap-y-3 mb-5 md:mb-0">
                 <div className="col-span-12">
                   <label htmlFor="modal-form-1" className="form-label">
-                    Video Title
+                    Still dummy
                   </label>
                   <input
                     onChange={handleChangeInput}
-                    value={newUserDetails.name}
+                    value={newUserDetails.email}
                     id="modal-form-1"
                     name="name"
                     type="text"
@@ -249,16 +255,30 @@ const Users = () => {
               <div className="modal-body grid grid-cols-12 gap-4 gap-y-3 mb-5 md:mb-0">
                 <div className="col-span-12">
                   <label htmlFor="modal-form-1" className="form-label">
-                    Video Title
+                    User Email
                   </label>
                   <input
                     onChange={handleChangeEditInput}
-                    value={currentUser?.name}
+                    value={currentUser?.email}
                     id="modal-form-1"
-                    name="name"
-                    type="text"
+                    name="email"
+                    type="email"
                     className="form-control"
-                    placeholder="Video title"
+                    placeholder="Email"
+                  />
+                </div>
+                <div className="col-span-12">
+                  <label htmlFor="modal-form-1" className="form-label">
+                    Phone Number
+                  </label>
+                  <input
+                    onChange={handleChangeEditInput}
+                    value={currentUser?.phoneNumber}
+                    id="modal-form-1"
+                    name="phoneNumber"
+                    type="email"
+                    className="form-control"
+                    placeholder="Phone number"
                   />
                 </div>
               </div>
@@ -308,8 +328,13 @@ const Users = () => {
                 <input
                     type="text"
                     className="form-control w-full mt-2 sm:mt-0"
-                    placeholder="Search by name..."
-                    onChange={(e) => setsearchVal(e.target.value)}
+                    placeholder="Search by email..."
+                    onChange={(e) => {
+                      setsearchVal(e.target.value)
+                      if(e.target.value === "") {
+                        getUsers(meta.currPage, meta.limit);
+                      }
+                    }}
                     value={searchVal}
                   />
                 </div>
@@ -335,10 +360,11 @@ const Users = () => {
                       <table className="table">
                         <thead>
                           <tr>
-                            <th className="whitespace-nowrap">Name</th>
-                            <th className="whitespace-nowrap">Category</th>
-                            <th className="whitespace-nowrap">Region</th>
-                            <th className="whitespace-nowrap">Release Date</th>
+                            <th className="whitespace-nowrap">Email</th>
+                            <th className="whitespace-nowrap">Phone Number</th>
+                            <th className="whitespace-nowrap">Phone IMEI</th>
+                            <th className="whitespace-nowrap">Subscription Status</th>
+                            <th className="whitespace-nowrap">Date of Registration</th>
                             {/* <th className="whitespace-nowrap">Banner</th> */}
                             {(loggedinAdmin?.privileges?.includes("edit") || loggedinAdmin?.privileges?.includes("super admin")) && (
                               <th className="whitespace-nowrap text-right">
@@ -350,15 +376,11 @@ const Users = () => {
                         <tbody>
                           {users.map((user, i) => (
                             <tr key={`video-${i}`}>
-                              <td className="whitespace-nowrap">{user.name}</td>
-                              <td className="whitespace-nowrap">{user.category}</td>
-                              <td className="whitespace-nowrap">{user.region}</td>
-                              <td className="whitespace-nowrap">
-                                {user.releaseDate}
-                              </td>
-                              {/* <td className="whitespace-nowrap w-24">
-                                <img className="object-contain" alt="video img" src={user.image} />
-                              </td> */}
+                              <td className="whitespace-nowrap">{user.email}</td>
+                              <td className="whitespace-nowrap">{user.phoneNumber}</td>
+                              <td className="whitespace-nowrap">{user.phoneIMEI}</td>
+                              <td className="whitespace-nowrap">{user.hasSubscribed ? "Active" : "Inactive"}</td>
+                              <td className="whitespace-nowrap">{formatDate(user.createdAt)}</td>                              
                               {(loggedinAdmin?.privileges?.includes("edit") || loggedinAdmin?.privileges?.includes("super admin")) && (
                               <td className="whitespace-nowrap">
                                   <ShowDropDown
@@ -390,7 +412,7 @@ const Users = () => {
                       aria-label="Page Size"
                       onChange={handleSelectLimit}
                     >
-                      <option value={6}>6</option>
+                      <option value={5}>5</option>
                       <option value={10}>10</option>
                       <option value={20}>20</option>
                     </select>

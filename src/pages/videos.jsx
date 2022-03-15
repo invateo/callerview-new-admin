@@ -71,8 +71,13 @@ const Videos = () => {
       AxiosInstance.get(`/video/search?q=${searchVal}`)
         .then(res => { 
           setVideos([...res.data.data]);
+          setMeta({
+            ...meta,
+            total: res.data.data.length,
+            currPage: 1,
+            pages: 1
+          })
           dispatch(switchLoading(false));
-          setsearchVal("");
         })
         .catch(error => {
           dispatch(switchLoading(false));
@@ -82,6 +87,7 @@ const Videos = () => {
   }
   const handleSelectLimit = (e) => {
     const val = e.target.value;
+    setsearchVal("");
     setMeta({...meta, limit: val});
     getVideos(meta.currPage, val);
   }
@@ -110,7 +116,7 @@ const Videos = () => {
           AxiosInstance.get("/region")
           .then((res) => {
             dispatch(switchLoading(false));
-            let result = [...new Set(res.data.data.regions)];
+            let result = [...res.data.data];
             setRegions(result);
           })
         })
@@ -391,9 +397,9 @@ const Videos = () => {
                     onChange={handleChangeInput}
                   >
                     <option value="" >Select one:</option>
-                    {regions.map((el, i) => (
-                      <option key={i} value={el}>
-                        {el}
+                    {regions.map((el) => (
+                      <option key={el._id} value={el.name}>
+                        {el.name}
                       </option>
                     ))}
                   </select>
@@ -581,9 +587,9 @@ const Videos = () => {
                     onChange={handleChangeEditInput}
                   >
                     <option value="" >Select one:</option>
-                    {regions.map((el, i) => (
-                      <option key={i} value={el}>
-                        {el}
+                    {regions.map((el) => (
+                      <option key={el._id} value={el.name}>
+                        {el.name}
                       </option>
                     ))}
                   </select>
@@ -824,7 +830,7 @@ const Videos = () => {
                       onChange={handleCategoryFilter}
                     >
                       <option value="all">All</option>
-                      {categories.map((el, i) => (
+                      {categories.map((el) => (
                         <option key={el._id} value={el.name}>
                           {el.name}
                         </option>
@@ -841,9 +847,9 @@ const Videos = () => {
                       onChange={handleRegionFilter}
                     >
                       <option value="all">All</option>
-                      {regions.map((el, i) => (
-                        <option key={i} value={el}>
-                          {el}
+                      {regions.map((el) => (
+                        <option key={el._id} value={el.name}>
+                          {el.name}
                         </option>
                       ))}
                     </select>
@@ -858,7 +864,12 @@ const Videos = () => {
                       type="text"
                       className="form-control w-full mt-2 sm:mt-0"
                       placeholder="Search by video title..."
-                      onChange={(e) => setsearchVal(e.target.value)}
+                      onChange={(e) => {
+                        setsearchVal(e.target.value)
+                        if(e.target.value === "") {
+                          getVideos(meta.currPage, meta.limit);
+                        }
+                      }}
                       value={searchVal}
                     />
                   </div>

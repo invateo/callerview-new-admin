@@ -33,12 +33,12 @@ const Dashboard = () => {
 
   useEffect(() => {
     dispatch(switchLoading(true));
-    AxiosInstance.get("/total/users")
+    AxiosInstance.get("/user/all")
       .then((res) => {
-        let result = res.data.data.totalUsers;
+        let result = res.data.data.userCount;
         AxiosInstance.get("/admin/all")
           .then((res) => {
-            let admins = res.data.data.length;
+            let admins = res.data.data.count;
             AxiosInstance.get("/video/all")
               .then((res) => {
                 dispatch(switchLoading(false));

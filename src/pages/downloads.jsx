@@ -31,6 +31,12 @@ const Downloads = () => {
       AxiosInstance.get(`/video/search?q=${searchVal}`)
         .then(res => { 
           setVideos([...res.data.data]);
+          setMeta({
+            ...meta,
+            total: res.data.data.length,
+            currPage: 1,
+            pages: 1
+          })
           dispatch(switchLoading(false));
           setsearchVal("");
         })
@@ -42,6 +48,7 @@ const Downloads = () => {
   }
   const handleSelectLimit = (e) => {
     const val = e.target.value;
+    setsearchVal("");
     setMeta({...meta, limit: val});
     getVideos(meta.currPage, val);
   }
