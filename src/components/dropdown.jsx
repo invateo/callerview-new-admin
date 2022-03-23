@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { ReactComponent as MenuIcon } from "../assets/icons/menu.svg";
 
-export const ShowDropDown = ({ openDeleteModal, openEditModal, access}) => {
+export const ShowDropDown = ({ openDeleteModal, openEditModal, openStatusModal, access, type}) => {
   const [isShow, setIsShow] = useState(false);
   const [dropdown, setdropdown] = useState("none");
   useEffect(() => {
@@ -55,6 +55,17 @@ export const ShowDropDown = ({ openDeleteModal, openEditModal, access}) => {
           >
             Edit
           </button>
+          {type === "ad" && (
+            <button
+              onClick={() => {
+                opendropdown();
+                openStatusModal();
+              }}
+              className="p-2 text-base text-slate-500 rounded-sm hover:bg-slate-100  cursor-pointer w-full text-left flex"
+            >
+              Change Status
+            </button>
+          )}
           {access && (
             <button
               onClick={() => {

@@ -30,7 +30,7 @@ const Videos = () => {
     total: 0,
     pages: 0,
     currPage: 1,
-    limit: 6
+    limit: 5
   })
   const [searchVal, setsearchVal] = useState("");
 
@@ -88,8 +88,12 @@ const Videos = () => {
   const handleSelectLimit = (e) => {
     const val = e.target.value;
     setsearchVal("");
-    setMeta({...meta, limit: val});
-    getVideos(meta.currPage, val);
+    setMeta({
+      ...meta,
+      currPage: 1,
+      limit: val
+    });
+    getVideos(1, val);
   }
   const handleBtnClick = (val) => {
     if (val === "prev") {
@@ -213,6 +217,15 @@ const Videos = () => {
   }
 
   const editVideo = () => {
+    if (
+      currentVideo.name.trim() === "" ||
+      currentVideo.category.trim() === "" ||
+      currentVideo.region.trim() === "" ||
+      currentVideo.releaseDate.trim() === "" ) {
+      toast.error("Please fill all fields!");
+    } else if (currentVideo.link.trim() === "" || currentVideo.image.trim() === "") {
+      toast.error("Please upload both the video and an image banner.");
+    } else {
     dispatch(switchLoading(true));
       AxiosInstance.put(`/video/single/${currentVideo._id}`, currentVideo)
       .then((res) => {
@@ -226,6 +239,7 @@ const Videos = () => {
         dispatch(switchLoading(false));
         toast.error(err?.response?.data?.message ?? "An unknown error occured.");
       });
+    }
   }
   const uploadFile = (e, type, setTypeLoading, video, setVideo) => {
     const selectedFile = e.target.files[0];
@@ -409,7 +423,7 @@ const Videos = () => {
                     Upload Image
                   </label>
                   <div className="form-control" onClick={() => {
-                    !uploadImgLoading && imageInput.current.click();
+                    !uploadImgLoading && imageInput?.current?.click();
                   }}>
                     <input
                       type="file"
@@ -446,7 +460,7 @@ const Videos = () => {
                     Upload Video
                   </label>
                   <div className="form-control p-0 h-32 bg-slate-200 relative" onClick={() => {
-                    !uploadVideoLoading && videoInput.current.click();
+                    !uploadVideoLoading && videoInput?.current?.click();
                   }}>
                     {newVideoDetails.link === "" ? (
                       <input
@@ -599,7 +613,7 @@ const Videos = () => {
                     Upload Image
                   </label>
                   <div className="form-control" onClick={() => {
-                    !uploadImgLoading && imageInput.current.click();
+                    !uploadImgLoading && imageInput?.current?.click();
                   }}>
                     <input
                       type="file"
@@ -636,7 +650,7 @@ const Videos = () => {
                     Upload Video
                   </label>
                   <div className="form-control" onClick={() => {
-                    !uploadVideoLoading && videoInput.current.click();
+                    !uploadVideoLoading && videoInput?.current?.click();
                   }}>
                       <input
                         type="file"
@@ -790,7 +804,7 @@ const Videos = () => {
                     Add New Video
                   </div>
                 </div>
-                <div className="sm:w-auto sm:mt-0" onClick={() => CSVInput.current.click()}>
+                <div className="sm:w-auto sm:mt-0" onClick={() => CSVInput?.current?.click()}>
                     <input
                       type="file"
                       style={{ display: "none" }}
@@ -961,7 +975,7 @@ const Videos = () => {
                       aria-label="Page Size"
                       onChange={handleSelectLimit}
                     >
-                      <option value={6}>6</option>
+                      <option value={5}>5</option>
                       <option value={10}>10</option>
                       <option value={20}>20</option>
                     </select>

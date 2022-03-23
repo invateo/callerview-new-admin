@@ -9,43 +9,39 @@ import { ShowDropDown } from "../components/dropdown";
 import {ReactComponent as UploadIcon} from '../assets/icons/loader-2.svg';
 import ReactPlayer from "react-player";
 import axios from "axios";
-import { formatDate } from "./videos";
 
 const Adverts = () => {
   const dispatch = useDispatch();
   const { loggedinAdmin: loggedinUser } = useSelector( state => state.utility);
-  const [categories, setCategories] = useState([]);
-  const [regions, setRegions] = useState([]);
-  const [videos, setVideos] = useState([]);
+  const [adverts, setAdverts] = useState([]);
   const [meta, setMeta] = useState({
     total: 0,
     pages: 0,
     currPage: 1,
-    limit: 6
+    limit: 5
   })
   const [searchVal, setsearchVal] = useState("");
 
-  const [newVideoModal, setNewVideoModal] = useState(false);
-  const [newVideoDetails, setNewVideoDetails] = useState({
+  const [newAdvertModal, setNewAdvertModal] = useState(false);
+  const [newAdvertDetails, setNewAdvertDetails] = useState({
     name: "",
     link: "",
-    category: "",
-    region: "",
-    releaseDate: "",
     image: ""
   });
   const [message, setMessage] = useState("");
   const [deleteModal, setDeleteModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
-  const [ currentVideoId, setCurrentVideoId] = useState("");
-  const [currentVideo, setCurrentVideo] = useState();
+  const [currentAdvertId, setCurrentAdvertId] = useState("");
+  const [currentAdvert, setCurrentAdvert] = useState();
   const [uploadImgLoading, setUploadImgLoading] = useState(false);
   const imageInput = useRef();
-  const [uploadVideoLoading, setUploadVideoLoading] = useState(false);
-  const videoInput = useRef();
+  const [uploadAdvertLoading, setUploadAdvertLoading] = useState(false);
+  const advertInput = useRef();
+  const [statusModal, setStatusModal] = useState(false);
+  const [adStatus, setAdStatus] = useState("");
 
   useEffect(() => {
-    getVideos();
+    getAdverts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -56,11 +52,16 @@ const Adverts = () => {
     }
     else {
       dispatch(switchLoading(true));
-      AxiosInstance.get(`/video/search?q=${searchVal}`)
+      AxiosInstance.get(`/advert/search?q=${searchVal}`)
         .then(res => { 
-          setVideos([...res.data.data]);
+          setAdverts([...res.data.data]);
+          setMeta({
+            ...meta,
+            total: res.data.data.length,
+            currPage: 1,
+            pages: 1
+          })
           dispatch(switchLoading(false));
-          setsearchVal("");
         })
         .catch(error => {
           dispatch(switchLoading(false));
@@ -70,37 +71,45 @@ const Adverts = () => {
   }
   const handleSelectLimit = (e) => {
     const val = e.target.value;
-    setMeta({...meta, limit: val});
-    getVideos(meta.currPage, val);
+    setMeta({
+      ...meta,
+      currPage: 1,
+      limit: val
+    });
+    getAdverts(1, val);
   }
   const handleBtnClick = (val) => {
     if (val === "prev") {
-      getVideos(meta.currPage - 1, meta.limit);
-    } else getVideos(meta.currPage + 1, meta.limit);
+      getAdverts(meta.currPage - 1, meta.limit);
+    } else getAdverts(meta.currPage + 1, meta.limit);
   }
-
-  const getVideos = (page, limit) => {
+  const handleStatusFilter = (e) => {
+    const val = e.target.value;
+    if (val !== "all") {
+      dispatch(switchLoading(true));
+      AxiosInstance.get("/advert/active")
+        .then(res => { 
+          setAdverts([...res.data.data.videos]);
+          dispatch(switchLoading(false));
+        })
+        .catch(error => {
+          dispatch(switchLoading(false));
+          toast.error(error.response.data? error.response.data.message : 'Unknown error');
+        });
+    } else getAdverts();
+  }
+  const getAdverts = (page, limit) => {
     dispatch(switchLoading(true));
-    AxiosInstance.get(`/video/view/${page ?? meta.currPage}?limit=${limit ?? meta.limit}`)
+    AxiosInstance.get(`/advert/view/${page ?? meta.currPage}?limit=${limit ?? meta.limit}`)
       .then((res) => {
+        dispatch(switchLoading(false));
         const result = res.data.data;
-        setVideos([...result?.video]);
+        setAdverts([...result?.video]);
         setMeta({
           ...meta,
           total: result?.count,
           currPage: parseInt(result?.page),
           pages: result?.pages
-        })
-        AxiosInstance.get("/category")
-        .then((res) => {
-          const result = res.data.data;
-          setCategories([...result]);
-          AxiosInstance.get("/region")
-          .then((res) => {
-            dispatch(switchLoading(false));
-            let result = [...new Set(res.data.data.regions)];
-            setRegions(result);
-          })
         })
       })
       .catch((err) => {
@@ -109,58 +118,40 @@ const Adverts = () => {
       });
   };
 
-  const handleCategoryFilter = (e) => {
-    const val = e.target.value;
-    if (val !== "all") {
-      let filteredVideos = videos.filter((el) => el.category === val);
-      setVideos(filteredVideos);
-    } else getVideos();
-  }
-  const handleRegionFilter = (e) => {
-    const val = e.target.value;
-    if (val !== "all") {
-      let filteredVideos = videos.filter((el) => el.region === val);
-      setVideos(filteredVideos);
-    } else getVideos();
-  }
-
-  const closeNewVideoModal = () => {
-    setNewVideoModal(false);
-    setNewVideoDetails({
+  const closeNewAdvertModal = () => {
+    setNewAdvertModal(false);
+    setNewAdvertDetails({
       name: "",
       link: "",
-      category: "",
-      region: "",
-      releaseDate: "",
       image: ""
     })
   }
 
   const handleChangeInput = (e) => {
-    setNewVideoDetails({
-      ...newVideoDetails,
+    setNewAdvertDetails({
+      ...newAdvertDetails,
       [e.target.name]: e.target.value
     })
   };
   const handleChangeEditInput = (e) => {
-    setCurrentVideo({
-      ...currentVideo,
+    setCurrentAdvert({
+      ...currentAdvert,
       [e.target.name]: e.target.value
     })
   };
 
   const confirmDelete = (id) => {
     setDeleteModal(true);
-    setCurrentVideoId(id);
+    setCurrentAdvertId(id);
   }
-  const deleteVideo = () => {
+  const deleteAdvert = () => {
       dispatch(switchLoading(true));
-      AxiosInstance.delete(`/video/delete/${currentVideoId}`)
+      AxiosInstance.delete(`/advert/delete/${currentAdvertId}`)
       .then((res) => {
-        toast.success("Video deleted successfully");
+        toast.success("Advert deleted successfully");
         setDeleteModal(false);
-        setCurrentVideoId("");
-        getVideos();
+        setCurrentAdvertId("");
+        getAdverts();
       })
       .catch((err) => {
         dispatch(switchLoading(false));
@@ -171,27 +162,41 @@ const Adverts = () => {
 
   const openEditModal = (payload) => {
     setEditModal(true);
-    setCurrentVideo(payload);
-    console.log("curr video", payload);
-    //more
+    setCurrentAdvert(payload);
+  }
+  const openStatusModal = (payload) => {
+    setStatusModal(true);
+    setCurrentAdvertId(payload?._id);
+    setAdStatus(payload?.active);
   }
 
-  const editVideo = () => {
-    dispatch(switchLoading(true));
-      AxiosInstance.put(`/video/single/${currentVideo._id}`, currentVideo)
-      .then((res) => {
-        toast.success("Video updated successfully");
-        setEditModal(false);
-        setCurrentVideoId("");
-        setCurrentVideo();
-        getVideos();
-      })
-      .catch((err) => {
-        dispatch(switchLoading(false));
-        toast.error(err?.response?.data?.message ?? "An unknown error occured.");
-      });
+  const editAdvert = () => {
+    if (currentAdvert?.name.trim() === "") {
+      toast.error("Please enter a title!");
+    } else if (currentAdvert?.link.trim() === "" || currentAdvert?.image.trim() === "") {
+      toast.error("Please upload both the advert and an image banner.");
+    } else {
+      let data = {
+        name: currentAdvert?.name,
+        link: currentAdvert?.link,
+        image: currentAdvert?.image
+      }
+      dispatch(switchLoading(true));
+        AxiosInstance.put(`/advert/single/${currentAdvert?._id}`, data)
+        .then((res) => {
+          toast.success("Advert updated successfully");
+          setEditModal(false);
+          setCurrentAdvertId("");
+          setCurrentAdvert();
+          getAdverts();
+        })
+        .catch((err) => {
+          dispatch(switchLoading(false));
+          toast.error(err?.response?.data?.message ?? "An unknown error occured.");
+        });
+    }
   }
-  const uploadFile = (e, type, setTypeLoading, video, setVideo) => {
+  const uploadFile = (e, type, setTypeLoading, advert, setAdvert) => {
     const selectedFile = e.target.files[0];
     let data = new FormData();
     data.append("video", selectedFile);
@@ -210,10 +215,10 @@ const Adverts = () => {
     .then((res) => {
       if (res.data.status === 200) {
         setTypeLoading(false);
-        type !== "img" && setMessage("Video uploaded!");
+        type !== "img" && setMessage("Advert uploaded!");
         if (type === "img") {
-          setVideo({ ...video, image: res.data.url });
-        } else setVideo({ ...video, link: res.data.url });
+          setAdvert({ ...advert, image: res.data.url });
+        } else setAdvert({ ...advert, link: res.data.url });
       }
     })
     .catch((err) => {
@@ -223,26 +228,22 @@ const Adverts = () => {
     });
   }
 
-  const addNewVideo = () => {
-    if (
-      newVideoDetails.name.trim() === "" ||
-      newVideoDetails.category.trim() === "" ||
-      newVideoDetails.region.trim() === "" ||
-      newVideoDetails.releaseDate.trim() === "" ) {
-      toast.error("Please fill all fields!");
-    } else if (newVideoDetails.link.trim() === "" || newVideoDetails.image.trim() === "") {
-      toast.error("Please upload both the video and an image banner.");
+  const addNewAdvert = () => {
+    if (newAdvertDetails.name.trim() === "") {
+      toast.error("Please enter a title!");
+    } else if (newAdvertDetails.link.trim() === "" || newAdvertDetails.image.trim() === "") {
+      toast.error("Please upload both the advert and an image banner.");
     } else {
       dispatch(switchLoading(true));
-      AxiosInstance.post("/video/create", newVideoDetails)
+      AxiosInstance.post("/advert/create", newAdvertDetails)
         .then(res => {
           dispatch(switchLoading(false));
-          toast.success("New video created successfully");
-          setVideos([
-            ...videos,
+          toast.success("New advert created successfully");
+          setAdverts([
+            ...adverts,
             res.data.data
           ])
-          closeNewVideoModal();
+          closeNewAdvertModal();
         })
         .catch(error => {
           dispatch(switchLoading(false));
@@ -250,93 +251,63 @@ const Adverts = () => {
         });
     }
   }
+  const editAdStatus = () => {
+    const data = {
+      status: adStatus === "active",
+      advertID: currentAdvertId
+    }
+      dispatch(switchLoading(true));
+      AxiosInstance.put("/advert/active", data)
+        .then(res => {
+          dispatch(switchLoading(false));
+          toast.success("Advert status updated successfully");
+          setStatusModal(false);
+          setCurrentAdvertId("");
+          setAdStatus("");
+          getAdverts();
+        })
+        .catch(error => {
+          dispatch(switchLoading(false));
+          toast.error(error.response.data? error.response.data.message : 'Unknown error');
+        });
+  }
 
   return (
     <>  
-      {newVideoModal && (
+      {newAdvertModal && (
         <CustomModal
-          modalIsOpen={newVideoModal}
-          closeModal={closeNewVideoModal}
-          headerTitle={"Add New Video"}
+          modalIsOpen={newAdvertModal}
+          closeModal={closeNewAdvertModal}
+          headerTitle={"Add New Advert"}
         >
-          <div className="modal-dialog modal-lg">
+          <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-body grid grid-cols-12 gap-4 gap-y-3 mb-5 md:mb-0">
-                <div className="col-span-12 md:col-span-6">
+                <div className="col-span-12">
                   <label htmlFor="modal-form-1" className="form-label">
-                    Video Title
+                    Advert Title
                   </label>
                   <input
                     onChange={handleChangeInput}
-                    value={newVideoDetails.name}
+                    value={newAdvertDetails.name}
                     id="modal-form-1"
                     name="name"
                     type="text"
                     className="form-control"
-                    placeholder="Video title"
+                    placeholder="Advert title"
                   />
-                </div>
-                <div className="col-span-12 md:col-span-6">
-                  <label htmlFor="modal-form-1" className="form-label">
-                    Release Date
-                  </label>
-                  <input
-                    onChange={handleChangeInput}
-                    value={formatDate(newVideoDetails.releaseDate)}
-                    id="modal-form-1"
-                    type="date"
-                    name="releaseDate"
-                    className="form-control"
-                    placeholder="Video title"
-                  />
-                </div>
-                <div className="col-span-12 md:col-span-6">
-                  <label htmlFor="modal-form-1" className="form-label">
-                    Category
-                  </label>
-                  <select
-                    name="category"
-                    id="modal-form-1"
-                    className="form-control form-select"
-                    onChange={handleChangeInput}
-                  >
-                    <option value="">Select one:</option>
-                    {categories.map((el) => (
-                      <option key={el._id} value={el.name}>
-                        {el.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="col-span-12 md:col-span-6">
-                  <label htmlFor="modal-form-1" className="form-label">
-                    Region
-                  </label>
-                  <select
-                    name="region"
-                    id="modal-form-1"
-                    className="form-control form-select"
-                    onChange={handleChangeInput}
-                  >
-                    <option value="" >Select one:</option>
-                    {regions.map((el, i) => (
-                      <option key={i} value={el}>
-                        {el}
-                      </option>
-                    ))}
-                  </select>
                 </div>
                 <div className="col-span-12 md:col-span-6">
                   <label htmlFor="modal-form-2" className="form-label">
                     Upload Image
                   </label>
                   <div className="form-control" onClick={() => {
-                    !uploadImgLoading && imageInput.current.click();
+                    !uploadImgLoading && imageInput?.current?.click();
                   }}>
                     <input
                       type="file"
                       style={{ display: "none" }}
-                      onChange={(e) => uploadFile(e, "img", setUploadImgLoading, newVideoDetails, setNewVideoDetails)}
+                      onChange={(e) => uploadFile(e, "img", setUploadImgLoading, newAdvertDetails, setNewAdvertDetails)}
                       accept="image/*"
                       ref={imageInput}
                       id="modal-form-2"
@@ -356,7 +327,7 @@ const Adverts = () => {
                   </label>
                   <input
                     disabled
-                    value={newVideoDetails.image}
+                    value={newAdvertDetails.image}
                     id="modal-form-2"
                     type="text"
                     className="form-control"
@@ -368,31 +339,31 @@ const Adverts = () => {
                     Upload Video
                   </label>
                   <div className="form-control p-0 h-32 bg-slate-200 relative" onClick={() => {
-                    !uploadVideoLoading && videoInput.current.click();
+                    !uploadAdvertLoading && advertInput?.current?.click();
                   }}>
-                    {newVideoDetails.link === "" ? (
+                    {newAdvertDetails.link === "" ? (
                       <input
                         type="file"
                         style={{ display: "none" }}
-                        onChange={(e) => uploadFile(e, "video", setUploadVideoLoading, newVideoDetails, setNewVideoDetails)}
+                        onChange={(e) => uploadFile(e, "video", setUploadAdvertLoading, newAdvertDetails, setNewAdvertDetails)}
                         accept="video/*"
-                        ref={videoInput}
+                        ref={advertInput}
                         id="modal-form-2"
-                        disabled={uploadVideoLoading}
+                        disabled={uploadAdvertLoading}
                       />
                     ) : (
                       <>
                         <ReactPlayer
-                          url={newVideoDetails.link}
+                          url={newAdvertDetails.link}
                           controls={true}
-                          light={newVideoDetails.image ?? true}
+                          light={newAdvertDetails.image ?? true}
                           width="100%"
                           height="8rem"
                         />
-                        <p className="text-success mt-2 text-sm">You can edit this later.</p>
+                        <p className="text-success mt-1 text-xs">You can edit this later.</p>
                       </>
                     )}
-                    {uploadVideoLoading ? (
+                    {uploadAdvertLoading ? (
                       <p className="text-sm text-center absolute uploader w-full">
                         <UploadIcon className="mx-auto" />
                       </p>
@@ -407,7 +378,7 @@ const Adverts = () => {
                   </label>
                   <input
                     disabled
-                    value={newVideoDetails.link}
+                    value={newAdvertDetails.link}
                     id="modal-form-2"
                     type="text"
                     className="form-control"
@@ -418,12 +389,12 @@ const Adverts = () => {
             </div>
               <div className="modal-footer footed text-right">
                 <div
-                  onClick={closeNewVideoModal}
+                  onClick={closeNewAdvertModal}
                   className="btn btn-outline-secondary w-auto mr-2"
                 >
                   Cancel
                 </div>
-                <div onClick={addNewVideo} className="btn btn-primary w-auto">
+                <div onClick={addNewAdvert} className="btn btn-primary w-auto">
                   Add New
                 </div>
               </div>
@@ -435,10 +406,10 @@ const Adverts = () => {
           modalIsOpen={deleteModal}
           closeModal={() => {
             setDeleteModal(false);
-            setCurrentVideoId("");
+            setCurrentAdvertId("");
           }}
-          deleteAction={deleteVideo}
-          headerTitle={"Video"}
+          deleteAction={deleteAdvert}
+          headerTitle={"Advert"}
         />
       )}
       {editModal && (
@@ -447,86 +418,36 @@ const Adverts = () => {
           closeModal={() => {
             setEditModal(false);
           }}
-          headerTitle={"Edit Video Details"}
+          headerTitle={"Edit Advert Details"}
         >
-          <div className="modal-dialog modal-lg">
+          <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-body grid grid-cols-12 gap-4 gap-y-3 mb-5 md:mb-0">
-                <div className="col-span-12 md:col-span-6">
+                <div className="col-span-12">
                   <label htmlFor="modal-form-1" className="form-label">
-                    Video Title
+                    Advert Title
                   </label>
                   <input
                     onChange={handleChangeEditInput}
-                    value={currentVideo?.name}
+                    value={currentAdvert?.name}
                     id="modal-form-1"
                     name="name"
                     type="text"
                     className="form-control"
-                    placeholder="Video title"
+                    placeholder="Advert title"
                   />
-                </div>
-                <div className="col-span-12 md:col-span-6">
-                  <label htmlFor="modal-form-1" className="form-label">
-                    Release Date
-                  </label>
-                  <input
-                    onChange={handleChangeEditInput}
-                    value={formatDate(currentVideo?.releaseDate)}
-                    id="modal-form-1"
-                    type="date"
-                    name="releaseDate"
-                    className="form-control"
-                    placeholder="Video title"
-                  />
-                </div>
-                <div className="col-span-12 md:col-span-6">
-                  <label htmlFor="modal-form-1" className="form-label">
-                    Category
-                  </label>
-                  <select
-                    name="category"
-                    id="modal-form-1"
-                    className="form-control form-select"
-                    onChange={handleChangeEditInput}
-                  >
-                    <option value="">Select one:</option>
-                    {categories.map((el) => (
-                      <option key={el._id} value={el.name}>
-                        {el.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="col-span-12 md:col-span-6">
-                  <label htmlFor="modal-form-1" className="form-label">
-                    Region
-                  </label>
-                  <select
-                    name="region"
-                    id="modal-form-1"
-                    className="form-control form-select"
-                    onChange={handleChangeEditInput}
-                  >
-                    <option value="" >Select one:</option>
-                    {regions.map((el, i) => (
-                      <option key={i} value={el}>
-                        {el}
-                      </option>
-                    ))}
-                  </select>
                 </div>
                 <div className="col-span-12 md:col-span-6">
                   <label htmlFor="modal-form-2" className="form-label">
                     Upload Image
                   </label>
                   <div className="form-control" onClick={() => {
-                    !uploadImgLoading && imageInput.current.click();
+                    !uploadImgLoading && imageInput?.current?.click();
                   }}>
                     <input
                       type="file"
                       style={{ display: "none" }}
-                      onChange={(e) => uploadFile(e, "img", setUploadImgLoading, currentVideo, setCurrentVideo)}
+                      onChange={(e) => uploadFile(e, "img", setUploadImgLoading, currentAdvert, setCurrentAdvert)}
                       accept="image/*"
                       ref={imageInput}
                       id="modal-form-2"
@@ -546,7 +467,7 @@ const Adverts = () => {
                   </label>
                   <input
                     disabled
-                    value={currentVideo.image}
+                    value={currentAdvert?.image}
                     id="modal-form-2"
                     type="text"
                     className="form-control"
@@ -558,18 +479,18 @@ const Adverts = () => {
                     Upload Video
                   </label>
                   <div className="form-control" onClick={() => {
-                    !uploadVideoLoading && videoInput.current.click();
+                    !uploadAdvertLoading && advertInput?.current?.click();
                   }}>
                       <input
                         type="file"
                         style={{ display: "none" }}
-                        onChange={(e) => uploadFile(e, "video", setUploadVideoLoading, currentVideo, setCurrentVideo)}
+                        onChange={(e) => uploadFile(e, "video", setUploadAdvertLoading, currentAdvert, setCurrentAdvert)}
                         accept="video/*"
-                        ref={videoInput}
+                        ref={advertInput}
                         id="modal-form-2"
-                        disabled={uploadVideoLoading}
+                        disabled={uploadAdvertLoading}
                       />
-                    {uploadVideoLoading ? (
+                    {uploadAdvertLoading ? (
                       <p className="text-sm">
                         <UploadIcon />
                       </p>
@@ -587,7 +508,7 @@ const Adverts = () => {
                   </label>
                   <input
                     disabled
-                    value={currentVideo.link}
+                    value={currentAdvert?.link}
                     id="modal-form-2"
                     type="text"
                     className="form-control"
@@ -605,19 +526,61 @@ const Adverts = () => {
                 >
                   Cancel
                 </div>
-                <div onClick={editVideo} className="btn btn-primary w-auto">
+                <div onClick={editAdvert} className="btn btn-primary w-auto">
                   Update
                 </div>
               </div>
           </div>
         </CustomModal>
       )}
-      <Layout title="Videos">
+      {statusModal && (
+        <CustomModal
+          modalIsOpen={statusModal}
+          closeModal={() => {
+            setStatusModal(false);
+          }}
+          headerTitle={"Edit Advert Status"}
+        >
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-body grid grid-cols-12 gap-4 gap-y-3 mb-5 md:mb-0">
+                <div className="col-span-12">
+                  <label htmlFor="modal-form-1" className="form-label">
+                    Change Status
+                  </label>
+                  <select
+                      className="form-control"
+                      onChange={(e) => setAdStatus(e.target.value)}
+                      value={adStatus}
+                    >
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+              </div>
+            </div>
+              <div className="modal-footer footed text-right">
+                <div
+                  onClick={() => {
+                    setStatusModal(false);
+                  }}
+                  className="btn btn-outline-secondary w-auto mr-2"
+                >
+                  Cancel
+                </div>
+                <div onClick={editAdStatus} className="btn btn-primary w-auto">
+                  Update
+                </div>
+              </div>
+          </div>
+        </CustomModal>
+      )}
+      <Layout title="Adverts">
         <>
           <div className="top-bar mt-3">
             <div className="pt-10 pb-4">
               <h2 className="text-2xl text-black font-medium mr-5">
-                Adverts <span className="text-sm">(to be edited with correct endpoints)</span>
+                Adverts
               </h2>
             </div>
           </div>
@@ -627,7 +590,7 @@ const Adverts = () => {
             </h2>
             {(loggedinUser?.privileges?.includes("create") || loggedinUser?.privileges?.includes("super admin")) && (
               <div className="sm:w-auto sm:mt-0">
-                <div className="btn btn-primary shadow-md" onClick={() => setNewVideoModal(true)}>
+                <div className="btn btn-primary shadow-md" onClick={() => setNewAdvertModal(true)}>
                   Add New Advert
                 </div>
               </div>
@@ -641,37 +604,16 @@ const Adverts = () => {
               >
                 <div className="w-full sm:flex lg:w-1/2 justify-start items-center">
                   <div className="sm:flex items-center mb-4 sm:mb-0 sm:mr-8">
-                    <label className="w-12 flex-none xl:w-auto xl:flex-initial mr-2">
-                      Category:
+                    <label className="w-15 flex-none xl:w-auto xl:flex-initial mr-2">
+                      Filter by:
                     </label>
                     <select
                       id="tabulator-html-filter-field"
                       className="form-select w-full sm:w-32 xxl:w-full mt-2 sm:mt-0 sm:w-auto"
-                      onChange={handleCategoryFilter}
+                      onChange={handleStatusFilter}
                     >
                       <option value="all">All</option>
-                      {categories.map((el, i) => (
-                        <option key={el._id} value={el.name}>
-                          {el.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="sm:flex items-center mr-0">
-                    <label className="w-12 flex-none xl:w-auto xl:flex-initial mr-2">
-                      Region:
-                    </label>
-                    <select
-                      id="tabulator-html-filter-field"
-                      className="form-select w-full sm:w-32 xxl:w-full mt-2 sm:mt-0 sm:w-auto"
-                      onChange={handleRegionFilter}
-                    >
-                      <option value="all">All</option>
-                      {regions.map((el, i) => (
-                        <option key={i} value={el}>
-                          {el}
-                        </option>
-                      ))}
+                      <option value="active">Active</option>
                     </select>
                   </div>
                 </div>
@@ -684,7 +626,12 @@ const Adverts = () => {
                       type="text"
                       className="form-control w-full mt-2 sm:mt-0"
                       placeholder="Search by video title..."
-                      onChange={(e) => setsearchVal(e.target.value)}
+                      onChange={(e) => {
+                        setsearchVal(e.target.value)
+                        if(e.target.value === "") {
+                          getAdverts(meta.currPage, meta.limit);
+                        }
+                      }}
                       value={searchVal}
                     />
                   </div>
@@ -705,18 +652,17 @@ const Adverts = () => {
               <div className="mt-5 pb-5 tabulator">
                 <div id="responsive-table">
                   <div className="overflow-x-auto">
-                    {videos.length === 0 ? (
-                      <div className="w-full text-center my-10">No videos.</div>
+                    {adverts.length === 0 ? (
+                      <div className="w-full text-center my-10">No adverts.</div>
                     ) : (
                       <table className="table">
                         <thead>
                           <tr>
                             <th className="whitespace-nowrap">Name</th>
-                            <th className="whitespace-nowrap">Category</th>
-                            <th className="whitespace-nowrap">Region</th>
-                            <th className="whitespace-nowrap">Release Date</th>
+                            <th className="whitespace-nowrap">Number of Usage</th>
+                            <th className="whitespace-nowrap">Advert Status</th>
                             {/* <th className="whitespace-nowrap">Banner</th> */}
-                            <th className="whitespace-nowrap">Video Preview</th>
+                            <th className="whitespace-nowrap">Preview</th>
                             {(loggedinUser?.privileges?.includes("edit") || loggedinUser?.privileges?.includes("super admin")) && (
                               <th className="whitespace-nowrap text-right">
                                 Actions
@@ -725,22 +671,19 @@ const Adverts = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {videos.map((video, i) => (
-                            <tr key={`video-${i}`}>
-                              <td className="whitespace-nowrap">{video.name}</td>
-                              <td className="whitespace-nowrap">{video.category}</td>
-                              <td className="whitespace-nowrap">{video.region}</td>
-                              <td className="whitespace-nowrap">
-                                {video.releaseDate}
-                              </td>
+                          {adverts.map((advert, i) => (
+                            <tr key={`advert-${i}`}>
+                              <td className="whitespace-nowrap">{advert.name}</td>
+                              <td className="whitespace-nowrap">{advert.numberOfUsage}</td>
+                              <td className="whitespace-nowrap">{advert.active ? "Active" : "Inactive"}</td>
                               {/* <td className="whitespace-nowrap w-24">
-                                <img className="object-contain" alt="video img" src={video.image} />
+                                <img className="object-contain" alt="advert img" src={advert.image} />
                               </td> */}
                               <td className="whitespace-nowrap">
                                 <ReactPlayer
-                                  url={video.link}
+                                  url={advert.link}
                                   controls={true}
-                                  light={video.image ?? true}
+                                  light={advert.image ?? true}
                                   width="100%"
                                   height="8rem"
                                 />
@@ -749,12 +692,16 @@ const Adverts = () => {
                                 <td className="whitespace-nowrap">
                                     <ShowDropDown
                                       openDeleteModal={() => {
-                                        confirmDelete(video._id);
+                                        confirmDelete(advert._id);
                                       }}
                                       openEditModal={() => {
-                                        openEditModal(video);
+                                        openEditModal(advert);
+                                      }}
+                                      openStatusModal={() => {
+                                        openStatusModal(advert);
                                       }}
                                       access={loggedinUser?.privileges?.includes("super admin")}
+                                      type="ad"
                                     />
                                 </td>
                               )}
@@ -776,7 +723,7 @@ const Adverts = () => {
                       aria-label="Page Size"
                       onChange={handleSelectLimit}
                     >
-                      <option value={6}>6</option>
+                      <option value={5}>5</option>
                       <option value={10}>10</option>
                       <option value={20}>20</option>
                     </select>
