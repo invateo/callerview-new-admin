@@ -77,8 +77,12 @@ const Categories = () => {
   const handleSelectLimit = (e) => {
     const val = e.target.value;
     setsearchVal("");
-    setMeta({...meta, limit: val});
-    getCategories(meta.currPage, val);
+    setMeta({
+      ...meta,
+      currPage: 1,
+      limit: val
+    });
+    getCategories(1, val);
   }
   const handleBtnClick = (val) => {
     if (val === "prev") {

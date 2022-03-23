@@ -69,8 +69,12 @@ const Users = () => {
   const handleSelectLimit = (e) => {
     const val = e.target.value;
     setsearchVal("");
-    setMeta({...meta, limit: val});
-    getUsers(meta.currPage, val);
+    setMeta({
+      ...meta,
+      currPage: 1,
+      limit: val
+    });
+    getUsers(1, val);
   }
   const handleBtnClick = (val) => {
     if (val === "prev") {
@@ -244,7 +248,7 @@ const Users = () => {
           <div className="top-bar mt-3">
             <div className="pt-10 pb-4">
               <h2 className="text-2xl text-black font-medium  mr-5">
-                Users Management <span className="text-sm">(to be edited with correct endpoints)</span>
+                Users Management
               </h2>
             </div>
           </div>

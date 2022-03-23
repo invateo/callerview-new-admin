@@ -77,8 +77,12 @@ const Regions = () => {
   const handleSelectLimit = (e) => {
     const val = e.target.value;
     setsearchVal("");
-    setMeta({...meta, limit: val});
-    getRegions(meta.currPage, val);
+    setMeta({
+      ...meta,
+      currPage: 1,
+      limit: val
+    });
+    getRegions(1, val);
   }
   const handleBtnClick = (val) => {
     if (val === "prev") {

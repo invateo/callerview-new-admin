@@ -67,8 +67,12 @@ const Admin = () => {
   const handleSelectLimit = (e) => {
     const val = e.target.value;
     setsearchVal("");
-    setMeta({...meta, limit: val});
-    getAdmins(meta.currPage, val);
+    setMeta({
+      ...meta,
+      currPage: 1,
+      limit: val
+    });
+    getAdmins(1, val);
   }
   const handleBtnClick = (val) => {
     if (val === "prev") {

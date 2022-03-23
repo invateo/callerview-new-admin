@@ -162,7 +162,7 @@ const Dashboard = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {stats.videos.slice(0, 6).map((video, i) => (
+                          {stats.videos.slice(0, 5).map((video, i) => (
                             <tr key={`video-${i}`}>
                               <td className="whitespace-nowrap">{video.name}</td>
                               <td className="whitespace-nowrap">

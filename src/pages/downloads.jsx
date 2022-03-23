@@ -12,7 +12,7 @@ const Downloads = () => {
     total: 0,
     pages: 0,
     currPage: 1,
-    limit: 6
+    limit: 5
   })
   const [searchVal, setsearchVal] = useState("");
 
@@ -49,8 +49,12 @@ const Downloads = () => {
   const handleSelectLimit = (e) => {
     const val = e.target.value;
     setsearchVal("");
-    setMeta({...meta, limit: val});
-    getVideos(meta.currPage, val);
+    setMeta({
+      ...meta,
+      currPage: 1,
+      limit: val
+    });
+    getVideos(1, val);
   }
   const handleBtnClick = (val) => {
     if (val === "prev") {
@@ -156,7 +160,7 @@ const Downloads = () => {
                     aria-label="Page Size"
                     onChange={handleSelectLimit}
                   >
-                    <option value={6}>6</option>
+                    <option value={5}>5</option>
                     <option value={10}>10</option>
                     <option value={20}>20</option>
                   </select>
