@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { useSelector } from "react-redux";
 import { ReactComponent as Logo } from "../assets/icons/logo.svg";
 import { ReactComponent as BurgerIcon } from "../assets/icons/burger-menu.svg";
 import { ReactComponent as DashboardIcon } from "../assets/icons/dashboard.svg";
@@ -10,12 +9,11 @@ import { ReactComponent as AdvertIcon } from "../assets/icons/adverts.svg";
 import { ReactComponent as AdminIcon } from "../assets/icons/admins.svg";
 import { ReactComponent as CategoryIcon } from "../assets/icons/category.svg";
 import { ReactComponent as RegionIcon } from "../assets/icons/regions.svg";
-import { ReactComponent as SettingsIcon } from "../assets/icons/settings.svg";
+// import { ReactComponent as SettingsIcon } from "../assets/icons/settings.svg";
 import { ReactComponent as LogoutIcon } from "../assets/icons/logout.svg";
 import PageTitle from "./pageTitle";
 
 const Layout = ({ title, children }) => {
-  const { loggedinAdmin } = useSelector( state => state.utility);
   const [show, setShow] = useState(false);
   const toggleMenu = () => {
     setShow((val) => !val);
@@ -38,11 +36,17 @@ const Layout = ({ title, children }) => {
             >
               <Logo />
             </NavLink>
-            <div onClick={toggleMenu} id="mobile-menu-toggler" className={`${show ? "invert" : ""}`}>
+            <div
+              onClick={toggleMenu}
+              id="mobile-menu-toggler"
+              className={`${show ? "invert" : ""}`}
+            >
               <BurgerIcon />
             </div>
           </div>
-          <ul className={`${show ? "" : "hidden"} border-t border-theme-29 py-5`}>
+          <ul
+            className={`${show ? "" : "hidden"} border-t border-theme-29 py-5`}
+          >
             <li onClick={() => setShow(false)}>
               <NavLink
                 exact
@@ -137,7 +141,7 @@ const Layout = ({ title, children }) => {
                 <div className="menu__title"> Regions </div>
               </NavLink>
             </li>
-            {loggedinAdmin?.privileges?.includes("super admin") && (
+            {/* {loggedinAdmin?.privileges?.includes("super admin") && (
               <li onClick={() => setShow(false)}>
                 <NavLink
                   exact
@@ -151,7 +155,7 @@ const Layout = ({ title, children }) => {
                   <div className="menu__title"> Settings </div>
                 </NavLink>
               </li>
-            )}
+            )} */}
             <li className="menu__devider my-6"></li>
 
             <li>
@@ -276,21 +280,19 @@ const Layout = ({ title, children }) => {
                   <div className="side-menu__title"> Regions </div>
                 </NavLink>
               </li>
-              {loggedinAdmin?.privileges?.includes("super admin") && (
-                <li>
-                  <NavLink
-                    exact
-                    to="/settings"
-                    className="side-menu"
-                    activeClassName="side-menu--active"
-                  >
-                    <div className="side-menu__icon">
-                      <SettingsIcon />
-                    </div>
-                    <div className="side-menu__title"> Settings </div>
-                  </NavLink>
-                </li>
-              )}
+              {/* <li>
+                <NavLink
+                  exact
+                  to="/settings"
+                  className="side-menu"
+                  activeClassName="side-menu--active"
+                >
+                  <div className="side-menu__icon">
+                    <SettingsIcon />
+                  </div>
+                  <div className="side-menu__title"> Settings </div>
+                </NavLink>
+              </li> */}
               <li className="side-nav__devider my-6"></li>
               <li>
                 <div

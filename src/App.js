@@ -6,7 +6,7 @@ import Adverts from "./pages/adverts";
 import Users from "./pages/users";
 import Downloads from "./pages/downloads";
 import Videos from "./pages/videos";
-import Settings from "./pages/settings";
+// import Settings from "./pages/settings";
 import Categories from "./pages/settings/categories";
 import Regions from "./pages/settings/regions";
 import Login from "./pages/auth";
@@ -17,7 +17,6 @@ import { getLoggedinUser } from "./store/actions";
 
 const App = () => {
   const dispatch = useDispatch();
-  // const { loggedinAdmin } = useSelector( state => state.utility);
   let token = localStorage.getItem("CallerView-XXX");
 
   useEffect(() => {
@@ -46,8 +45,7 @@ const App = () => {
                   <Route path="/downloads" component={Downloads} />
                   <Route path="/categories" component={Categories} />
                   <Route path="/regions" component={Regions} />
-                  <Route path="/settings" component={Settings}/>
-                  {/* <Route path="/settings">{loggedinAdmin?.privileges?.includes("super admin") ?  <Settings /> : <Redirect to="/dashboard" />}</Route> */}
+                  {/* <Route path="/settings" component={Settings}/> */}
                 </>
               )}
               <Route component={() => <Redirect to="/" />} />

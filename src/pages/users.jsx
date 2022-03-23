@@ -19,20 +19,23 @@ const Users = () => {
     limit: 5
   })
   const [searchVal, setsearchVal] = useState("");
-
-  const [newUserModal, setNewUserModal] = useState(false);
-  const [newUserDetails, setNewUserDetails] = useState({
-    email: "",
-    phoneNumber: "",
-    password: "",
-    name: "",
-    pin: "",
-    phoneIMEI: ""
-  });
   const [deleteModal, setDeleteModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
-  const [ CurrentUserId, setCurrentUserId] = useState("");
-  const [currentUser, setCurrentUser] = useState();
+  const [currentUserId, setCurrentUserId] = useState("");
+  const [currentUser, setCurrentUser] = useState({
+    id: "",
+    pin: ""
+  });
+
+  // const [newUserModal, setNewUserModal] = useState(false);
+  // const [newUserDetails, setNewUserDetails] = useState({
+  //   email: "",
+  //   phoneNumber: "",
+  //   password: "",
+  //   name: "",
+  //   pin: "",
+  //   phoneIMEI: ""
+  // });
 
   useEffect(() => {
     getUsers();
@@ -95,24 +98,6 @@ const Users = () => {
       });
   };
 
-  const closenewUserModal = () => {
-    setNewUserModal(false);
-    setNewUserDetails({
-      name: "",
-      link: "",
-      category: "",
-      region: "",
-      releaseDate: "",
-      image: ""
-    })
-  }
-
-  const handleChangeInput = (e) => {
-    setNewUserDetails({
-      ...newUserDetails,
-      [e.target.name]: e.target.value
-    })
-  };
   const handleChangeEditInput = (e) => {
     setCurrentUser({
       ...currentUser,
@@ -126,7 +111,7 @@ const Users = () => {
   }
   const deleteUser = () => {
       dispatch(switchLoading(true));
-      AxiosInstance.delete(`/user/delete/${CurrentUserId}`)
+      AxiosInstance.delete(`/user/delete/${currentUserId}`)
       .then((res) => {
         toast.success("User deleted successfully");
         setDeleteModal(false);
@@ -142,95 +127,64 @@ const Users = () => {
 
   const openEditModal = (payload) => {
     setEditModal(true);
-    setCurrentUser(payload);
-    //more
+    setCurrentUser({
+      ...currentUser,
+      id: payload?._id,
+    });
   }
 
   const editUser = () => {
-    dispatch(switchLoading(true));
-      AxiosInstance.put(`/user/single/${currentUser._id}`, currentUser)
-      .then((res) => {
-        toast.success("User details updated successfully");
-        setEditModal(false);
-        setCurrentUserId("");
-        setCurrentUser();
-        getUsers();
-      })
-      .catch((err) => {
-        dispatch(switchLoading(false));
-        toast.error(err?.response?.data?.message ?? "An unknown error occured.");
-      });
+    console.log(currentUser);
+    if (currentUser?.pin.trim() === "") {
+      toast.error("Please enter a pin!")
+    } else if (currentUser?.pin.trim().length < 4) {
+      toast.error("Please enter a pin of at least 4 numbers!")
+    } else {
+      let data = {
+        pin: currentUser?.pin
+      }
+      dispatch(switchLoading(true));
+        AxiosInstance.put(`/user/update/${currentUser?.id}`, data)
+        .then((res) => {
+          toast.success("User details updated successfully");
+          setEditModal(false);
+          setCurrentUserId("");
+          setCurrentUser({
+            id: "",
+            pin: ""
+          });
+          getUsers();
+        })
+        .catch((err) => {
+          dispatch(switchLoading(false));
+          toast.error(err?.response?.data?.message ?? "An unknown error occured.");
+        });
+    }
   }
 
-  const addNewUser = () => {
-    // if (
-    //   newUserDetails.name.trim() === "" ||
-    //   newUserDetails.category.trim() === "" ||
-    //   newUserDetails.region.trim() === "" ||
-    //   newUserDetails.releaseDate.trim() === "" ) {
-    //   toast.error("Please fill all fields!");
-    // } else if (newUserDetails.link.trim() === "" || newUserDetails.image.trim() === "") {
-    //   toast.error("Please upload both the video and an image banner.");
-    // } else {
-    //   dispatch(switchLoading(true));
-    //   AxiosInstance.post("/video/create", newUserDetails)
-    //     .then(res => {
-    //       dispatch(switchLoading(false));
-    //       toast.success("New user created successfully");
-    //       setUsers([
-    //         ...users,
-    //         res.data.data
-    //       ])
-    //       closenewUserModal();
-    //     })
-    //     .catch(error => {
-    //       dispatch(switchLoading(false));
-    //       toast.error(error.response.data? error.response.data.message : 'Unknown error');
-    //     });
-    // }
-  }
+  // const closenewUserModal = () => {
+  //   setNewUserModal(false);
+  //   setNewUserDetails({
+  //     name: "",
+  //     link: "",
+  //     category: "",
+  //     region: "",
+  //     releaseDate: "",
+  //     image: ""
+  //   })
+  // }
+
+  // const handleChangeInput = (e) => {
+  //   setNewUserDetails({
+  //     ...newUserDetails,
+  //     [e.target.name]: e.target.value
+  //   })
+  // };
+
+  // const addNewUser = () => {};
 
   return (
     <>  
-      {newUserModal && (
-        <CustomModal
-          modalIsOpen={newUserModal}
-          closeModal={closenewUserModal}
-          headerTitle={"Add New User"}
-        >
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-body grid grid-cols-12 gap-4 gap-y-3 mb-5 md:mb-0">
-                <div className="col-span-12">
-                  <label htmlFor="modal-form-1" className="form-label">
-                    Still dummy
-                  </label>
-                  <input
-                    onChange={handleChangeInput}
-                    value={newUserDetails.email}
-                    id="modal-form-1"
-                    name="name"
-                    type="text"
-                    className="form-control"
-                    placeholder="Video title"
-                  />
-                </div>
-              </div>
-            </div>
-              <div className="modal-footer footed text-right">
-                <div
-                  onClick={closenewUserModal}
-                  className="btn btn-outline-secondary w-auto mr-2"
-                >
-                  Cancel
-                </div>
-                <div onClick={addNewUser} className="btn btn-primary w-auto">
-                  Add New
-                </div>
-              </div>
-          </div>
-        </CustomModal>
-      )}
       {deleteModal && (
         <ConfirmModal
           modalIsOpen={deleteModal}
@@ -255,30 +209,16 @@ const Users = () => {
               <div className="modal-body grid grid-cols-12 gap-4 gap-y-3 mb-5 md:mb-0">
                 <div className="col-span-12">
                   <label htmlFor="modal-form-1" className="form-label">
-                    User Email
+                    New Pin
                   </label>
                   <input
                     onChange={handleChangeEditInput}
-                    value={currentUser?.email}
+                    value={currentUser?.pin}
                     id="modal-form-1"
-                    name="email"
-                    type="email"
+                    name="pin"
+                    type="number"
                     className="form-control"
-                    placeholder="Email"
-                  />
-                </div>
-                <div className="col-span-12">
-                  <label htmlFor="modal-form-1" className="form-label">
-                    Phone Number
-                  </label>
-                  <input
-                    onChange={handleChangeEditInput}
-                    value={currentUser?.phoneNumber}
-                    id="modal-form-1"
-                    name="phoneNumber"
-                    type="email"
-                    className="form-control"
-                    placeholder="Phone number"
+                    placeholder="Enter new pin"
                   />
                 </div>
               </div>
@@ -312,13 +252,13 @@ const Users = () => {
             <h2 className="text-xl text-black font-medium  mr-5">
               All Users
             </h2>
-            {(loggedinAdmin?.privileges?.includes("create") || loggedinAdmin?.privileges?.includes("super admin")) && (
+            {/* {(loggedinAdmin?.privileges?.includes("create") || loggedinAdmin?.privileges?.includes("super admin")) && (
               <div className="sm:w-auto sm:mt-0">
                 <div className="btn btn-primary shadow-md" onClick={() => setNewUserModal(true)}>
                   Add New User
                 </div>
               </div>
-            )}
+            )} */}
           </div>
           <div className="intro-y box p-5 mt-8">
             <div className="flex flex-col sm:flex-row sm:items-end xl:items-start">
@@ -451,6 +391,45 @@ const Users = () => {
           </div>
         </>
       </Layout>
+      {/* {newUserModal && (
+        <CustomModal
+          modalIsOpen={newUserModal}
+          closeModal={closenewUserModal}
+          headerTitle={"Add New User"}
+        >
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-body grid grid-cols-12 gap-4 gap-y-3 mb-5 md:mb-0">
+                <div className="col-span-12">
+                  <label htmlFor="modal-form-1" className="form-label">
+                    Still dummy
+                  </label>
+                  <input
+                    onChange={handleChangeInput}
+                    value={newUserDetails.email}
+                    id="modal-form-1"
+                    name="name"
+                    type="text"
+                    className="form-control"
+                    placeholder="Video title"
+                  />
+                </div>
+              </div>
+            </div>
+              <div className="modal-footer footed text-right">
+                <div
+                  onClick={closenewUserModal}
+                  className="btn btn-outline-secondary w-auto mr-2"
+                >
+                  Cancel
+                </div>
+                <div onClick={addNewUser} className="btn btn-primary w-auto">
+                  Add New
+                </div>
+              </div>
+          </div>
+        </CustomModal>
+      )} */}
     </>
   );
 };
