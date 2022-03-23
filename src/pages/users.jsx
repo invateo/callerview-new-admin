@@ -266,10 +266,10 @@ const Users = () => {
           </div>
           <div className="intro-y box p-5 mt-8">
             <div className="flex flex-col sm:flex-row sm:items-end xl:items-start">
-              <form id="tabulator-html-filter-form" className="flex w-full">
-                <div className="sm:flex w-full items-center sm:mr-4 mt-2 xl:mt-0">
+              <form id="tabulator-html-filter-form" className="flex w-full items-end">
+                <div className="sm:flex w-full items-center mr-4">
                   <label className="flex-none w-auto xl:flex-initial mr-2">Search:</label>
-                <input
+                  <input
                     type="text"
                     className="form-control w-full mt-2 sm:mt-0"
                     placeholder="Search by email..."

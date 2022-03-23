@@ -167,7 +167,7 @@ const Adverts = () => {
   const openStatusModal = (payload) => {
     setStatusModal(true);
     setCurrentAdvertId(payload?._id);
-    setAdStatus(payload?.active);
+    setAdStatus(payload?.active ? "active" : "inactive");
   }
 
   const editAdvert = () => {
@@ -540,10 +540,11 @@ const Adverts = () => {
             setStatusModal(false);
           }}
           headerTitle={"Edit Advert Status"}
+          shortModal
         >
           <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-body grid grid-cols-12 gap-4 gap-y-3 mb-5 md:mb-0">
+            <div className="">
+              <div className="modal-body grid grid-cols-12 gap-4 gap-y-3 mb-5">
                 <div className="col-span-12">
                   <label htmlFor="modal-form-1" className="form-label">
                     Change Status
@@ -559,7 +560,7 @@ const Adverts = () => {
                 </div>
               </div>
             </div>
-              <div className="modal-footer footed text-right">
+              <div className="modal-footer text-right">
                 <div
                   onClick={() => {
                     setStatusModal(false);
