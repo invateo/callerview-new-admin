@@ -17,7 +17,7 @@ import { getLoggedinUser } from "./store/actions";
 
 const App = () => {
   const dispatch = useDispatch();
-  let token = localStorage.getItem("CallerView-XXX");
+  let token = localStorage.getItem("Callerview-XXX");
 
   useEffect(() => {
     if (token) {

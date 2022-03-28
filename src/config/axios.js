@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const gettoken = () => {
-  let token = localStorage.getItem("CallerView-XXX") ?? null;
+  let token = localStorage.getItem("Callerview-XXX") ?? null;
   return token;
 }
 export const base = "https://video-ringtone.herokuapp.com/api";

@@ -59,7 +59,7 @@ const ResetPassword = () => {
                         <div className="-intro-x text-white font-medium text-4xl leading-tight mt-10">
                             The all-in-one dashboard 
                             <br />
-                            for CallerView.
+                            for Callerview.
                         </div>
                     </div>
                 </div>
@@ -68,7 +68,7 @@ const ResetPassword = () => {
                         <h2 className="intro-x font-bold text-2xl xl:text-3xl text-center xl:text-left">
                             Reset Your Password
                         </h2>
-                        <div className="intro-x mt-2 text-gray-500 xl:hidden text-center">The all-in-one dashboard for CallerView.</div>
+                        <div className="intro-x mt-2 text-gray-500 xl:hidden text-center">The all-in-one dashboard for Callerview.</div>
                         <div class="intro-x text-slate-500 block mt-2 text-xs sm:text-sm">Enter your new password.</div>
                         <div className="intro-x mt-8">
                             <input 

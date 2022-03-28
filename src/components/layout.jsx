@@ -19,7 +19,7 @@ const Layout = ({ title, children }) => {
     setShow((val) => !val);
   }
   const logOut = () => {
-    localStorage.removeItem("CallerView-XXX");
+    localStorage.removeItem("Callerview-XXX");
     window.location.reload();
   };
   return (
